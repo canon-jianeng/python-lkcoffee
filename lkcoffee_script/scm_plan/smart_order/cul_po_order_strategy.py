@@ -329,13 +329,22 @@ def get_national_flag(goods_id):
             price_new = price_data[0]
             # 报价城市为全国(-1), 且"是否全国同一价"为"是"
             if str(price_new[0]) == '-1' and str(price_new[1]) == '1':
-                print('全国PO为"是"', '规格id:{}'.format(spec_id), '供应商id:{}'.format(supplier_id), '仓库列表:{}'.format(wh_list), '\n')
+                print(
+                    '全国PO为"是"', '规格id:{}'.format(spec_id), '供应商id:{}'.format(supplier_id),
+                    '仓库列表:{}'.format(wh_list), '\n'
+                )
                 cul_purchase_amount(goods_id, purchase_ratio, wh_list, 1)
             else:
-                print('全国PO为"否"', '规格id:{}'.format(spec_id), '供应商id:{}'.format(supplier_id), '仓库列表:{}'.format(wh_list), '\n')
+                print(
+                    '全国PO为"否"', '规格id:{}'.format(spec_id), '供应商id:{}'.format(supplier_id),
+                    '仓库列表:{}'.format(wh_list), '\n'
+                )
                 cul_purchase_amount(goods_id, purchase_ratio, wh_list, 0)
         else:
-            print('全国PO为"否"', '规格id:{}'.format(spec_id), '供应商id:{}'.format(supplier_id), '仓库列表:{}'.format(wh_list), '\n')
+            print(
+                '全国PO为"否"', '规格id:{}'.format(spec_id), '供应商id:{}'.format(supplier_id),
+                '仓库列表:{}'.format(wh_list), '\n'
+            )
             cul_purchase_amount(goods_id, purchase_ratio, wh_list, 0)
 
 
