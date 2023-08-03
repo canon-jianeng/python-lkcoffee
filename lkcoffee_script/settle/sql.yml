@@ -1,0 +1,57 @@
+mysql:
+  stock_purchase:
+    host: "10.218.2.10"
+    port: 3309
+    user: "purchaseweb_w"
+    pwd: "NwsKWt4jsXNAx8Wy"
+    db: "lucky_stock_purchase"
+  stock:
+    host: "10.218.2.12"
+    port: 3307
+    user: "dev_test3"
+    pwd: "dev_test3"
+    db: "lucky_stock"
+
+
+sql:
+  query_consign: "SELECT
+        consign.`no` AS '发货单',
+        supplier.`id`,
+        supplier.supplier_name
+    FROM t_consign consign
+    LEFT JOIN t_document document ON consign.document_id = document.id
+    LEFT JOIN t_supplier_info supplier ON document.supplier_no = supplier.supplier_code
+    LEFT JOIN t_order_stock_unit stock_unit ON consign.stock_unit_id = stock_unit.id
+    LEFT JOIN t_stock_cell stock_cell ON stock_cell.id = stock_unit.stock_unit_id
+    WHERE
+        stock_cell.cell_type = 1
+        AND consign.`status` in (5, 6)
+        AND consign.delivery_method != 5
+        AND consign.consign_type=1
+        AND supplier.`id` = {}
+        AND consign.estimated_date >= '{} 00:00:00' AND consign.estimated_date <= '{} 23:59:59';"
+  query_reserve: "SELECT
+        d.relation_no AS '发货单号/调拨单号',
+        o.reserve_no AS '预约单号',
+        d.spec_id AS '货物规格id',
+        o.supplier_code AS '供应商编号',
+        s.`name` AS '供应商名称',
+        o.wh_dept_id AS '送货仓库部门id',
+        w.warehouse_name AS '送货仓库',
+        o.arrival_time AS '到仓时间',
+        o.`status` AS '预约单状态',
+        o.arrival_status AS '到仓状态',
+        DATE_ADD(reserve_date, INTERVAL reserve_start_min minute) AS '预约开始时间',
+        DATE_ADD(reserve_date, INTERVAL reserve_end_min minute) AS '预约结束时间'
+    FROM t_stock_warehouse_receiving_reserve_order_detail d
+    LEFT JOIN t_stock_warehouse_receiving_reserve_order o ON d.reserve_id = o.id
+    LEFT JOIN t_stock_supplier s ON o.supplier_code = s.code
+    LEFT JOIN t_stock_warehouse w ON o.wh_dept_id = w.department_id
+    WHERE
+        o.`status` IN (1, 2, 3)
+        AND d.relation_no='{}';"
+
+
+
+
+

@@ -1,0 +1,40 @@
+
+mysql:
+  cooperation:
+    host: "10.218.2.12"
+    port: 3307
+    user: "dev_test3"
+    pwd: "dev_test3"
+    db: "lucky_cooperation"
+  purchase:
+    host: "10.218.2.10"
+    port: 3309
+    user: "purchaseweb_w"
+    pwd: "NwsKWt4jsXNAx8Wy"
+    db: "lucky_stock_purchase"
+
+
+sql:
+  query_supplier_info: "
+    SELECT
+      t10.`id`,
+      t9.supplier_mid,
+      t10.supplier_name
+    FROM
+      t_warehouse_spec_relation t8
+      LEFT JOIN t_stock_warehouse t7 on t8.warehouse_id = t7.id
+      LEFT JOIN t_stock_goods_spec t1 on t8.spec_id = t1.id
+      LEFT JOIN t_goods_spec_city_config t9 on t9.warehouse_id = t7.id and t1.id = t9.goods_spec_id
+      LEFT JOIN t_supplier_info t10 ON t10.supplier_code = t9.supplier_mid
+    WHERE
+      t1.`name` = '{}'
+      AND t7.warehouse_name = '{}';
+  "
+  insert_alg_purchase_replenishment_pred_future:
+    "INSERT INTO `lucky_cooperation`.`t_alg_purchase_replenishment_pred_future` (`wh_dept_id`, `goods_spec_id`, `proposal_num`, `available_stock`, `available_stock_day`, `plan_finish_date`, `order_7d`, `order_14d`, `order_28d`, `shipments_7d`, `shipments_14d`, `shipments_28d`, `create_time`) VALUES "
+  val_alg_purchase_replenishment_pred_future:
+    "('{}', '{}', 4000, 5000, 40, '2023-06-30', 400, 500, 600, 700, 800, 900, '2023-06-13 13:34:59')"
+  insert_bi_goods_spec_city_config:
+    "INSERT INTO `lucky_cooperation`.`t_bi_goods_spec_city_config` (`goods_spec_id`, `warehouse_id`, `wh_dept_id`, `city_id`, `city_purchase_status`, `supplier_id`, `supplier_mid`, `minimum_delivery`, `vlt`, `order_confirm_days`, `material_preparation_days`, `scheduling_days`, `coa_days`, `logistics_days`, `production_days`, `daily_capacity`, `delivery_multiple_ship`, `ltl_pallet_delivery`, `create_time`) VALUES "
+  val_bi_goods_spec_city_config:
+    "('{}', '{}', '{}', '{}', 1, '{}', '{}', 100, 26, 1, 5, 3, 0, 7, 10, 333, {}, NULL, '2023-06-14 01:31:10')"
