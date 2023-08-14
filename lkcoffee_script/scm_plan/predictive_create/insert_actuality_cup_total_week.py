@@ -77,6 +77,21 @@ for date_val in data:
 # print(week_list)
 
 
+# 增量周
+start_week_id = 99
+end_week_id = 102
+add_week_list = []
+cursor.execute(
+    sql_query.format(now_year)
+)
+data = cursor.fetchall()
+for date_val in data:
+    if start_week_id <= date_val[2] <= end_week_id:
+        add_week_list.append(date_val)
+print(add_week_list)
+week_list = add_week_list
+
+
 def get_week_range():
     # 当天日期往前30天的日期列表
     date_list = lk_tools.datetool.get_last_date(30)

@@ -144,6 +144,17 @@ def get_date_val(date_val: str):
     return new_date
 
 
+def date_compare(left_day, right_day, day_val):
+    # 判断日期在 [left_day, right_day] 范围内
+    left_date = datetime.datetime.strptime(left_day, '%Y-%m-%d')
+    right_date = datetime.datetime.strptime(right_day, '%Y-%m-%d')
+    date_val = datetime.datetime.strptime(day_val, '%Y-%m-%d')
+    if left_date <= date_val <= right_date:
+        return True
+    else:
+        return False
+
+
 if __name__ == '__main__':
     # print(get_month_date('2022-12', 4))
     print(get_future_date('2023-07', 3))
@@ -154,3 +165,4 @@ if __name__ == '__main__':
     # 上个月
     print(datetime.datetime.now().replace(day=1) - datetime.timedelta(days=1))
     print(get_date_val("2022-07-05"))
+    print(date_compare('2023-07-24', '2023-08-13', '2023-08-01'))
