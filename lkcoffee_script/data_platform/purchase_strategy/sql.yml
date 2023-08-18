@@ -12,3 +12,7 @@ sql:
     "SELECT (beg_amount + transit_amount_adj)/{}-avg_dmd 
     FROM t_dm_auto_cg_result 
     WHERE dt='{}' AND wh_dept_id={} AND goods_id={};"
+  query_ro_ss_vlt:
+    "SELECT rop, vlt, round(ceiling(safety_stock_adj/trans_ratio) * trans_ratio / avg_ss_dmd, 1)
+    FROM t_dm_auto_cg_result 
+    WHERE dt='{}' AND wh_dept_id={} AND goods_id={};"
