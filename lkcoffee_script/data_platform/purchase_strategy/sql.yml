@@ -1,0 +1,14 @@
+
+mysql:
+  dataplatform:
+    host: "10.218.2.12"
+    port: 3306
+    user: "dataplatform_w"
+    pwd: "WhFtjxAYkzZJF2Qd"
+    db: "lucky_dataplatform"
+
+sql:
+  query_central_avg_increase:
+    "SELECT (beg_amount + transit_amount_adj)/{}-avg_dmd 
+    FROM t_dm_auto_cg_result 
+    WHERE dt='{}' AND wh_dept_id={} AND goods_id={};"
