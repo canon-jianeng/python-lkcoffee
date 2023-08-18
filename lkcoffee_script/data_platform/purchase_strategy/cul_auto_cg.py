@@ -58,7 +58,9 @@ def cul_result(use_days, num):
     return central_increase, plan_date
 
 
+# 北京仓库
 wh_id = 4001
+# 原味调味糖浆
 goods_id = 4488
 RO = 4
 SS = 7
