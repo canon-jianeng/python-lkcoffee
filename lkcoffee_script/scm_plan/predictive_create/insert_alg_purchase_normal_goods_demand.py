@@ -41,7 +41,7 @@ wh_dept_id = [
 ]
 
 # 常规品
-goods_list = {'42', '44', '83070', '82796', '83623'}
+goods_list = {'42', '44', '83070', '82796', '83623', '48214'}
 
 
 with open('./sql.yml', encoding='utf-8') as f:

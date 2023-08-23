@@ -139,7 +139,7 @@ def cul_loss_amount(goods_id, wh_range, start_date, end_date):
 
 
 def cul_transit_amount(spec_id, national_flag, wh_list, increment_num):
-    # 日志关键词:【智慧订单】获取汇总在途成功
+    # 日志关键词:【智慧订单】获取汇总在途成功、仓库汇总在途1、仓库汇总在途2
     # 数仓取值: 在途CG、在途FH、在途调拨, 全国取各仓库总和
     # 数仓取值: 在途PO、在途PP, 全国取'-1'
     if national_flag == 1:
@@ -288,9 +288,11 @@ def cul_end_order_day(goods_id, increment_num):
     # 计划完成日期 - 当前日期 < vlt, "是否紧急PO"为是
     days = (finish_plan_date - now_date).days
     if days < po_vlt:
-        print("是否紧急PO{}: 是".format(increment_num), days, po_vlt)
+        print('计划完成日期-当前日期={} < vlt={}'.format(days, po_vlt))
+        print("是否紧急PO{}: 是".format(increment_num))
     else:
-        print("是否紧急PO{}: 否".format(increment_num), days, po_vlt)
+        print('计划完成日期-当前日期={} > vlt={}'.format(days, po_vlt))
+        print("是否紧急PO{}: 否".format(increment_num))
     # PO最晚下单日 = 计划完成日期 - po_vlt
     end_order_date = finish_plan_date - datetime.timedelta(days=po_vlt)
     print("PO{}最晚下单日".format(increment_num), end_order_date, '\n')
@@ -431,7 +433,7 @@ def cul_purchase_amount(goods_id, spec_id, purchase_ratio, wh_list, national_fla
     print('截止+{}在途量(采购单位)'.format(increment_num), transit_amount1 / purchase_ratio)
     print('截止+{}PO在途(采购单位)'.format(increment_num), transit_list[1] / purchase_ratio)
     print(current_stock[1])
-    print('当前库存(期末可用库存)', current_stock[0], '\n')
+    print('当前库存【期末可用库存】(采购单位)', current_stock[0] / purchase_ratio, '\n')
 
     # 全国需要各仓相加，不是取'-1'
     pred_new = cul_pred_data_total(0, goods_id, wh_list, 1, 18, start_date, end_date)
@@ -448,7 +450,7 @@ def cul_purchase_amount(goods_id, spec_id, purchase_ratio, wh_list, national_fla
 
 if __name__ == '__main__':
     # 玫瑰味糖浆
-    cul_end_order_day(44, increment_num=1)
-    cul_end_order_day(44, increment_num=2)
+    cul_end_order_day(48214, increment_num=1)
+    cul_end_order_day(48214, increment_num=2)
     # xcy咖啡豆
     get_national_flag(48214)
