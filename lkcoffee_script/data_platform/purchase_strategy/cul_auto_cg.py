@@ -74,24 +74,26 @@ def get_ro_ss_vlt(wh_id, goods_id):
 
 def cul_central(wh_id, goods_id):
     ro, vlt, ss = get_ro_ss_vlt(wh_id, goods_id)
-    print(ro, vlt, ss)
-    # （当前日+可用天数 ） ＜ 【下次调拨日】，则 计划完成日期 = 当前日 + 可用天数
+    print('RO: {}, VLT: {}, SS: {}'.format(ro, vlt, ss))
+    print('下次调拨日: {}, 下下次调拨日: {}'.format(next_transit_date, two_more_transit_date), '\n')
+
+    # 【当前日】+可用天数 ＜【下次调拨日】，则 计划完成日期 = 当前日 + 可用天数
     use_day = lk_tools.datetool.cul_days(now_date, next_transit_date)
     print('可用天数<', use_day)
 
-    print('（当前日+可用天数 ） ＜ 【下次调拨日】，则 计划完成日期 = 当前日 + 可用天数')
+    print('【当前日】+可用天数 ＜【下次调拨日】，则 计划完成日期 = 当前日 + 可用天数')
     use_day_num = use_day - 1
     central_avg_increase, plan_finish_date = cul_result(wh_id, goods_id, use_day_num, use_day_num)
     print('中心仓日均调整值:', math.floor(central_avg_increase))
     print('可用天数:', use_day_num)
     print('计划完成日期:', plan_finish_date, '\n')
 
-    # 【下次调拨日】 ≤ （当前日+可用天数 ）＜  【下下次调拨日】，则 计划完成日期 = 当前日 + 可用天数 - RO
+    # 【下次调拨日】 ≤ 【当前日】+可用天数 ＜ 【下下次调拨日】，则 计划完成日期 = 当前日 + 可用天数 - RO
     use_day_left = lk_tools.datetool.cul_days(now_date, next_transit_date)
     use_day_right = lk_tools.datetool.cul_days(now_date, two_more_transit_date)
     print(use_day_left, '<= 可用天数 <', use_day_right)
 
-    print('【下次调拨日】 ≤ （当前日+可用天数 ）＜  【下下次调拨日】，则 计划完成日期 = 当前日 + 可用天数 - RO')
+    print('【下次调拨日】 ≤ 【当前日】+可用天数 ＜ 【下下次调拨日】，则 计划完成日期 = 当前日 + 可用天数 - RO')
     use_day_num = use_day_left
     central_avg_increase, plan_finish_date = cul_result(wh_id, goods_id, use_day_num, use_day_num - ro)
     print('中心仓日均调整值:', math.floor(central_avg_increase))
@@ -104,13 +106,13 @@ def cul_central(wh_id, goods_id):
     print('可用天数:', use_day_num)
     print('计划完成日期:', plan_finish_date, '\n')
 
-    # 【下下次调拨日】  ≤ （当前日+可用天数 ）＜  【下下次调拨日】+RO+SS，则 计划完成日期 = 当前日 + VLT
+    # 【下下次调拨日】 ≤ 【当前日】+可用天数 ＜ 【下下次调拨日】+RO+SS，则 计划完成日期 = 当前日 + VLT
     use_day_left = lk_tools.datetool.cul_days(now_date, two_more_transit_date)
     res_date = lk_tools.datetool.cul_date(two_more_transit_date, ro + ss)
     use_day_right = lk_tools.datetool.cul_days(now_date, res_date)
     print(use_day_left, '<= 可用天数 <', use_day_right)
 
-    print('【下下次调拨日】  ≤ （当前日+可用天数 ）＜  【下下次调拨日】+RO+SS，则 计划完成日期 = 当前日 + VLT')
+    print('【下下次调拨日】 ≤ 【当前日】+可用天数 ＜ 【下下次调拨日】+RO+SS，则 计划完成日期 = 当前日 + VLT')
     use_day_num = use_day_left
     central_avg_increase, plan_finish_date = cul_result(wh_id, goods_id, use_day_num, vlt)
     print('中心仓日均调整值:', math.floor(central_avg_increase))
@@ -123,11 +125,11 @@ def cul_central(wh_id, goods_id):
     print('可用天数:', use_day_num)
     print('计划完成日期:', plan_finish_date, '\n')
 
-    # （当前日+可用天数 ）≥【下下次调拨日】+RO+SS，则 计划完成日期 = 当前日 + 可用天数 - RO - SS
+    # 【当前日】+可用天数 ≥ 【下下次调拨日】+RO+SS，则 计划完成日期 = 当前日 + 可用天数 - RO - SS
     use_day = lk_tools.datetool.cul_days(now_date, res_date)
     print(use_day, '<= 可用天数')
 
-    print('（当前日+可用天数 ）≥【下下次调拨日】+RO+SS，则 计划完成日期 = 当前日 + 可用天数 - RO - SS')
+    print('【当前日】+可用天数 ≥【下下次调拨日】+RO+SS，则 计划完成日期 = 当前日 + 可用天数 - RO - SS')
     use_day_num = use_day
     central_avg_increase, plan_finish_date = cul_result(wh_id, goods_id, use_day_num, use_day_num - ro - ss)
     print('中心仓日均调整值:', math.floor(central_avg_increase))
@@ -145,10 +147,10 @@ if __name__ == '__main__':
     # 仓库为中心仓 且 货物为中心仓模式
     central_flag = 1
     if central_flag == 1:
-        # 北京仓库
-        wh_dept_id = 4001
-        # 原味调味糖浆
-        good_id = 4488
+        # 武汉仓库
+        wh_dept_id = 22001
+        # 海盐芝士厚切吐司
+        good_id = 13729
         cul_central(wh_dept_id, good_id)
     else:
         # 广州仓库

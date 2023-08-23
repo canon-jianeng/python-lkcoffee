@@ -138,7 +138,7 @@ def cul_loss_amount(goods_id, wh_range, start_date, end_date):
     return loss_total, get_dict
 
 
-def cul_transit_amount(goods_id, national_flag, wh_list, increment_num):
+def cul_transit_amount(spec_id, national_flag, wh_list, increment_num):
     # 日志关键词:【智慧订单】获取汇总在途成功
     # 数仓取值: 在途CG、在途FH、在途调拨, 全国取各仓库总和
     # 数仓取值: 在途PO、在途PP, 全国取'-1'
@@ -151,25 +151,25 @@ def cul_transit_amount(goods_id, national_flag, wh_list, increment_num):
     else:
         purchase_val = '+2'
     # 在途CG(type=2)
-    cg_amount = transit_data[str(goods_id)][purchase_val][wh_val]['transit_type_2']
+    cg_amount = transit_data[purchase_val][str(spec_id)]['transit_type_2']
     # 在途FH(type=3)
-    fh_amount = transit_data[str(goods_id)][purchase_val][wh_val]['transit_type_3']
+    fh_amount = transit_data[purchase_val][str(spec_id)]['transit_type_3']
     # 在途调拨(type=4)
-    trs_amount = transit_data[str(goods_id)][purchase_val][wh_val]['transit_type_4']
+    trs_amount = transit_data[purchase_val][str(spec_id)]['transit_type_4']
     # 在途PO(type=1)
-    po_amount = transit_data[str(goods_id)][purchase_val][wh_val]['transit_type_1']
+    po_amount = transit_data[purchase_val][str(spec_id)]['transit_type_1']
     # 在途PP(type=0)
-    pp_amount = transit_data[str(goods_id)][purchase_val][wh_val]['transit_type_0']
+    pp_amount = transit_data[purchase_val][str(spec_id)]['transit_type_0']
     return pp_amount, po_amount, cg_amount, fh_amount, trs_amount
 
 
-def cul_current_stock(goods_id, wh_list):
+def cul_current_stock(spec_id, wh_list):
     # 日志关键词:【智慧订单】获取实时库存
     # 数仓取值: 当前库存
     get_dict = {}
     stock_total = 0
     for data_dict in stock_list:
-        if data_dict['goodsId'] == goods_id and data_dict['whDeptId'] in wh_list:
+        if str(data_dict['specId']) == spec_id and data_dict['whDeptId'] in wh_list:
             get_dict.update({data_dict['whDeptId']: data_dict['totalNum']})
             stock_total += data_dict['totalNum']
     return stock_total, get_dict
@@ -211,6 +211,18 @@ def cul_pred_data(adjust_flag, goods_id, wh_id, mark_type, type_val, start_date,
             cup_goods_id = sql_data[0][0]
         else:
             cup_goods_id = ''
+        if cup_goods_id == '':
+            # 消耗预测, 取当前年算法预测V0版本
+            cursor.execute(
+                sql_pred_v0.format(
+                    year_val, goods_id, wh_id
+                )
+            )
+            sql_data = cursor.fetchall()
+            if sql_data != () and sql_data is not None:
+                cup_goods_id = sql_data[0][0]
+            else:
+                cup_goods_id = ''
 
     # 查询预测数据
     pred_total = 0
@@ -333,24 +345,25 @@ def get_national_flag(goods_id):
                     '全国PO为"是"', '规格id:{}'.format(spec_id), '供应商id:{}'.format(supplier_id),
                     '仓库列表:{}'.format(wh_list), '\n'
                 )
-                cul_purchase_amount(goods_id, purchase_ratio, wh_list, 1)
+                cul_purchase_amount(goods_id, spec_id, purchase_ratio, wh_list, 1)
             else:
                 print(
                     '全国PO为"否"', '规格id:{}'.format(spec_id), '供应商id:{}'.format(supplier_id),
                     '仓库列表:{}'.format(wh_list), '\n'
                 )
-                cul_purchase_amount(goods_id, purchase_ratio, wh_list, 0)
+                cul_purchase_amount(goods_id, spec_id, purchase_ratio, wh_list, 0)
         else:
             print(
                 '全国PO为"否"', '规格id:{}'.format(spec_id), '供应商id:{}'.format(supplier_id),
                 '仓库列表:{}'.format(wh_list), '\n'
             )
-            cul_purchase_amount(goods_id, purchase_ratio, wh_list, 0)
+            cul_purchase_amount(goods_id, spec_id, purchase_ratio, wh_list, 0)
 
 
-def cul_purchase_amount(goods_id, purchase_ratio, wh_list, national_flag, increment_num=2):
+def cul_purchase_amount(goods_id, spec_id, purchase_ratio, wh_list, national_flag, increment_num=2):
     """
     :param goods_id: 货物id
+    :param spec_id: 货物规格id
     :param purchase_ratio: 用料采购单位换算
     :param national_flag: 全国PO, 是-1, 否-0
     :param wh_list: 仓库列表
@@ -368,10 +381,10 @@ def cul_purchase_amount(goods_id, purchase_ratio, wh_list, national_flag, increm
         print('+0周期需求量(采购单位)', pred_consume/purchase_ratio, '\n')
         # T-1, T-2, T-3, T-4周日均消耗
         day_consume = cul_day_consume(goods_id, wh_range)
-        print('T-1周日均消耗(采购单位)', day_consume[0] / purchase_ratio)
-        print('T-2周日均消耗(采购单位)', day_consume[1] / purchase_ratio)
-        print('T-3周日均消耗(采购单位)', day_consume[2] / purchase_ratio)
-        print('T-4周日均消耗(采购单位)', day_consume[3] / purchase_ratio, '\n')
+        print('T-1周日均消耗(采购单位)', round(day_consume[0] / purchase_ratio, 5))
+        print('T-2周日均消耗(采购单位)', round(day_consume[1] / purchase_ratio, 5))
+        print('T-3周日均消耗(采购单位)', round(day_consume[2] / purchase_ratio, 5))
+        print('T-4周日均消耗(采购单位)', round(day_consume[3] / purchase_ratio, 5), '\n')
 
     # 获取T日, T+1月最后一天或者T+2月最后一天
     date_list = get_date_range(increment_num)
@@ -380,10 +393,10 @@ def cul_purchase_amount(goods_id, purchase_ratio, wh_list, national_flag, increm
     pred_consume = cul_pred_consume(goods_id, wh_range, start_date, end_date)
     ss_cnt = cul_ss_cnt(increment_num, goods_id, wh_range)
     loss_amount = cul_loss_amount(goods_id, wh_range, start_date, end_date)
-    transit_list = cul_transit_amount(goods_id, national_flag, wh_list, increment_num)
+    transit_list = cul_transit_amount(spec_id, national_flag, wh_list, increment_num)
     transit_total = transit_list[0] + transit_list[1] + transit_list[2] + transit_list[3] + transit_list[4]
     transit_amount1 = transit_list[2] + transit_list[3] + transit_list[4]
-    current_stock = cul_current_stock(goods_id, wh_list)
+    current_stock = cul_current_stock(spec_id, wh_list)
 
     purchase_num, purchase_ratio_num = 0, 0
     if increment_num == 1:
@@ -395,7 +408,7 @@ def cul_purchase_amount(goods_id, purchase_ratio, wh_list, national_flag, increm
         print('+{}采购量(采购单位)'.format(increment_num), purchase_ratio_num)
     elif increment_num == 2:
         purchase_amount1 = cul_purchase_amount(
-            goods_id, purchase_ratio, wh_list,
+            goods_id, spec_id, purchase_ratio, wh_list,
             national_flag=national_flag,
             increment_num=1
         )
@@ -423,11 +436,11 @@ def cul_purchase_amount(goods_id, purchase_ratio, wh_list, national_flag, increm
     # 全国需要各仓相加，不是取'-1'
     pred_new = cul_pred_data_total(0, goods_id, wh_list, 1, 18, start_date, end_date)
     print('查询+{}周期新品预测数据'.format(increment_num), pred_new/purchase_ratio)
-    pred_new_adjust = cul_pred_data(1, goods_id, wh_list, 1, 18, start_date, end_date)
+    pred_new_adjust = cul_pred_data_total(1, goods_id, wh_list, 1, 18, start_date, end_date)
     print('查询调整后+{}周期新品预测数据'.format(increment_num), pred_new_adjust/purchase_ratio)
-    pred_common = cul_pred_data(0, goods_id, wh_list, 2, 19, start_date, end_date)
+    pred_common = cul_pred_data_total(0, goods_id, wh_list, 2, 19, start_date, end_date)
     print('查询+{}周期常规品预测数据'.format(increment_num), pred_common/purchase_ratio)
-    pred_common_adjust = cul_pred_data(1, goods_id, wh_list, 2, 19, start_date, end_date)
+    pred_common_adjust = cul_pred_data_total(1, goods_id, wh_list, 2, 19, start_date, end_date)
     print('查询调整后+{}周期常规品预测数据'.format(increment_num), pred_common_adjust/purchase_ratio, '\n')
 
     return purchase_num
@@ -438,4 +451,4 @@ if __name__ == '__main__':
     cul_end_order_day(44, increment_num=1)
     cul_end_order_day(44, increment_num=2)
     # xx饼干
-    get_national_flag(84344)
+    get_national_flag(48214)
