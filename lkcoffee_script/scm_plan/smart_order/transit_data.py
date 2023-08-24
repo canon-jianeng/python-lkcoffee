@@ -1,93 +1,357 @@
-
 transit_data = {
-    '+1': {
-        '301814': {
-            'transit_type_0': 4200,
-            'transit_type_1': 4200,
-            'transit_type_2': 2300,
-            'transit_type_3': 2300,
-            'transit_type_4': 2300
+    'type_0': [
+        {
+            "specId": 328428,
+            "whDeptId": 327193,
+            "ztNum": 1000
         },
-        '306240': {
-            'transit_type_0': 5100,
-            'transit_type_1': 5100,
-            'transit_type_2': 3900,
-            'transit_type_3': 3900,
-            'transit_type_4': 3900
+        {
+            "specId": 3284938,
+            "whDeptId": 327193,
+            "ztNum": 2500
         },
-        '364742': {
-            'transit_type_0': 0,
-            'transit_type_1': 0,
-            'transit_type_2': 0,
-            'transit_type_3': 0,
-            'transit_type_4': 0
+        {
+            "specId": 3284938,
+            "whDeptId": 245971,
+            "ztNum": 2600
         },
-        '3284846': {
-            'transit_type_0': 1700,
-            'transit_type_1': 1700,
-            'transit_type_2': 7400,
-            'transit_type_3': 7400,
-            'transit_type_4': 7400
+        {
+            "specId": 3284938,
+            "whDeptId": 245871,
+            "ztNum": 2700
         },
-        '365940': {
-            'transit_type_0': 5900,
-            'transit_type_1': 5900,
-            'transit_type_2': 12700,
-            'transit_type_3': 12700,
-            'transit_type_4': 12700
+        {
+            "specId": 3284938,
+            "whDeptId": 326932,
+            "ztNum": 2800
         },
-        '365941': {
-            'transit_type_0': 6100,
-            'transit_type_1': 6100,
-            'transit_type_2': 13100,
-            'transit_type_3': 13100,
-            'transit_type_4': 13100
+        {
+            "specId": 3284938,
+            "whDeptId": 245770,
+            "ztNum": 3000
+        },
+        {
+            "specId": 301814,
+            "whDeptId": -1,
+            "ztNum": 4200
+        },
+        {
+            "specId": 306240,
+            "whDeptId": -1,
+            "ztNum": 5100
+        },
+        {
+            "specId": 328428,
+            "whDeptId": -1,
+            "ztNum": 5300
         }
-
-    },
-    '+2': {
-        '301814': {
-            'transit_type_0': 4200,
-            'transit_type_1': 4200,
-            'transit_type_2': 2300,
-            'transit_type_3': 2300,
-            'transit_type_4': 2300
+    ],
+    'type_1': [
+        {
+            "specId": 328428,
+            "whDeptId": 327193,
+            "ztNum": 1000
         },
-        '306240': {
-            'transit_type_0': 5100,
-            'transit_type_1': 5100,
-            'transit_type_2': 3900,
-            'transit_type_3': 3900,
-            'transit_type_4': 3900
+        {
+            "specId": 3284938,
+            "whDeptId": 327193,
+            "ztNum": 2500
         },
-        '364742': {
-            'transit_type_0': 0,
-            'transit_type_1': 0,
-            'transit_type_2': 0,
-            'transit_type_3': 0,
-            'transit_type_4': 0
+        {
+            "specId": 3284938,
+            "whDeptId": 245971,
+            "ztNum": 2600
         },
-        '3284846': {
-            'transit_type_0': 1700,
-            'transit_type_1': 1700,
-            'transit_type_2': 7400,
-            'transit_type_3': 7400,
-            'transit_type_4': 7400
+        {
+            "specId": 3284938,
+            "whDeptId": 245871,
+            "ztNum": 2700
         },
-        '365940': {
-            'transit_type_0': 5900,
-            'transit_type_1': 5900,
-            'transit_type_2': 12700,
-            'transit_type_3': 12700,
-            'transit_type_4': 12700
+        {
+            "specId": 3284938,
+            "whDeptId": 326932,
+            "ztNum": 2800
         },
-        '365941': {
-            'transit_type_0': 6100,
-            'transit_type_1': 6100,
-            'transit_type_2': 13100,
-            'transit_type_3': 13100,
-            'transit_type_4': 13100
+        {
+            "specId": 3284938,
+            "whDeptId": 245770,
+            "ztNum": 3000
+        },
+        {
+            "specId": 301814,
+            "whDeptId": -1,
+            "ztNum": 4200
+        },
+        {
+            "specId": 306240,
+            "whDeptId": -1,
+            "ztNum": 5100
+        },
+        {
+            "specId": 328428,
+            "whDeptId": -1,
+            "ztNum": 5300
         }
-
-    }
+    ],
+    'type_2': [
+        {
+            "specId": 301814,
+            "whDeptId": 327193,
+            "ztNum": 1000
+        },
+        {
+            "specId": 301814,
+            "whDeptId": 245971,
+            "ztNum": 1100
+        },
+        {
+            "specId": 301814,
+            "whDeptId": 245871,
+            "ztNum": 1200
+        },
+        {
+            "specId": 306240,
+            "whDeptId": 326932,
+            "ztNum": 1900
+        },
+        {
+            "specId": 306240,
+            "whDeptId": 245770,
+            "ztNum": 2000
+        },
+        {
+            "specId": 328428,
+            "whDeptId": 245971,
+            "ztNum": 2100
+        },
+        {
+            "specId": 328428,
+            "whDeptId": 245871,
+            "ztNum": 2200
+        },
+        {
+            "specId": 328428,
+            "whDeptId": 326932,
+            "ztNum": 2300
+        },
+        {
+            "specId": 328428,
+            "whDeptId": 245770,
+            "ztNum": 2500
+        },
+        {
+            "specId": 328428,
+            "whDeptId": 327193,
+            "ztNum": 2600
+        },
+        {
+            "specId": 3284938,
+            "whDeptId": 327193,
+            "ztNum": 7500
+        },
+        {
+            "specId": 3284938,
+            "whDeptId": 245971,
+            "ztNum": 7600
+        },
+        {
+            "specId": 3284938,
+            "whDeptId": 245871,
+            "ztNum": 7700
+        },
+        {
+            "specId": 3284938,
+            "whDeptId": 326932,
+            "ztNum": 7800
+        },
+        {
+            "specId": 3284938,
+            "whDeptId": 245770,
+            "ztNum": 8000
+        },
+        {
+            "specId": 364742,
+            "whDeptId": 245871,
+            "ztNum": 9000
+        },
+        {
+            "specId": 364743,
+            "whDeptId": 245871,
+            "ztNum": 8800
+        }
+    ],
+    'type_3': [
+        {
+            "specId": 301814,
+            "whDeptId": 327193,
+            "ztNum": 1000
+        },
+        {
+            "specId": 301814,
+            "whDeptId": 245971,
+            "ztNum": 1100
+        },
+        {
+            "specId": 301814,
+            "whDeptId": 245871,
+            "ztNum": 1200
+        },
+        {
+            "specId": 306240,
+            "whDeptId": 326932,
+            "ztNum": 1900
+        },
+        {
+            "specId": 306240,
+            "whDeptId": 245770,
+            "ztNum": 2000
+        },
+        {
+            "specId": 328428,
+            "whDeptId": 245971,
+            "ztNum": 2100
+        },
+        {
+            "specId": 328428,
+            "whDeptId": 245871,
+            "ztNum": 2200
+        },
+        {
+            "specId": 328428,
+            "whDeptId": 326932,
+            "ztNum": 2300
+        },
+        {
+            "specId": 328428,
+            "whDeptId": 245770,
+            "ztNum": 2500
+        },
+        {
+            "specId": 328428,
+            "whDeptId": 327193,
+            "ztNum": 2600
+        },
+        {
+            "specId": 3284938,
+            "whDeptId": 327193,
+            "ztNum": 7500
+        },
+        {
+            "specId": 3284938,
+            "whDeptId": 245971,
+            "ztNum": 7600
+        },
+        {
+            "specId": 3284938,
+            "whDeptId": 245871,
+            "ztNum": 7700
+        },
+        {
+            "specId": 3284938,
+            "whDeptId": 326932,
+            "ztNum": 7800
+        },
+        {
+            "specId": 3284938,
+            "whDeptId": 245770,
+            "ztNum": 8000
+        },
+        {
+            "specId": 364742,
+            "whDeptId": 245871,
+            "ztNum": 9000
+        },
+        {
+            "specId": 364743,
+            "whDeptId": 245871,
+            "ztNum": 8800
+        }
+    ],
+    'type_4': [
+        {
+            "specId": 301814,
+            "whDeptId": 327193,
+            "ztNum": 1000
+        },
+        {
+            "specId": 301814,
+            "whDeptId": 245971,
+            "ztNum": 1100
+        },
+        {
+            "specId": 301814,
+            "whDeptId": 245871,
+            "ztNum": 1200
+        },
+        {
+            "specId": 306240,
+            "whDeptId": 326932,
+            "ztNum": 1900
+        },
+        {
+            "specId": 306240,
+            "whDeptId": 245770,
+            "ztNum": 2000
+        },
+        {
+            "specId": 328428,
+            "whDeptId": 245971,
+            "ztNum": 2100
+        },
+        {
+            "specId": 328428,
+            "whDeptId": 245871,
+            "ztNum": 2200
+        },
+        {
+            "specId": 328428,
+            "whDeptId": 326932,
+            "ztNum": 2300
+        },
+        {
+            "specId": 328428,
+            "whDeptId": 245770,
+            "ztNum": 2500
+        },
+        {
+            "specId": 328428,
+            "whDeptId": 327193,
+            "ztNum": 2600
+        },
+        {
+            "specId": 3284938,
+            "whDeptId": 327193,
+            "ztNum": 7500
+        },
+        {
+            "specId": 3284938,
+            "whDeptId": 245971,
+            "ztNum": 7600
+        },
+        {
+            "specId": 3284938,
+            "whDeptId": 245871,
+            "ztNum": 7700
+        },
+        {
+            "specId": 3284938,
+            "whDeptId": 326932,
+            "ztNum": 7800
+        },
+        {
+            "specId": 3284938,
+            "whDeptId": 245770,
+            "ztNum": 8000
+        },
+        {
+            "specId": 364742,
+            "whDeptId": 245871,
+            "ztNum": 9000
+        },
+        {
+            "specId": 364743,
+            "whDeptId": 245871,
+            "ztNum": 8800
+        }
+    ]
 }

@@ -49,7 +49,8 @@ sql_pred_v0 = mysql_sql['cooperation']['query_pred_v0']
 sql_pred_amount = mysql_sql['cooperation']['query_pred_amount']
 sql_day_consume = mysql_sql['cooperation']['query_day_consume']
 sql_vlt = mysql_sql['cooperation']['query_vlt']
-sql_spec_wh = mysql_sql['cooperation']['query_spec']
+sql_spec_wh = mysql_sql['cooperation']['query_spec_wh']
+sql_spec = mysql_sql['cooperation']['query_spec']
 sql_purchase_ratio = mysql_sql['cooperation']['query_purchase_ratio']
 sql_national_price = mysql_sql['srm']['query_national_price']
 
@@ -138,41 +139,70 @@ def cul_loss_amount(goods_id, wh_range, start_date, end_date):
     return loss_total, get_dict
 
 
-def cul_transit_amount(spec_id, national_flag, wh_list, increment_num):
+def cul_transit_amount(type_val: int, spec_list: list, wh_list: list, national_flag=0):
     # 日志关键词:【智慧订单】获取汇总在途成功、仓库汇总在途1、仓库汇总在途2
-    # 数仓取值: 在途CG、在途FH、在途调拨, 全国取各仓库总和
-    # 数仓取值: 在途PO、在途PP, 全国取'-1'
-    if national_flag == 1:
-        wh_val = '-1'
-    else:
-        wh_val = str(wh_list[0])
-    if increment_num == 1:
-        purchase_val = '+1'
-    else:
-        purchase_val = '+2'
-    # 在途CG(type=2)
-    cg_amount = transit_data[purchase_val][str(spec_id)]['transit_type_2']
-    # 在途FH(type=3)
-    fh_amount = transit_data[purchase_val][str(spec_id)]['transit_type_3']
-    # 在途调拨(type=4)
-    trs_amount = transit_data[purchase_val][str(spec_id)]['transit_type_4']
-    # 在途PO(type=1)
-    po_amount = transit_data[purchase_val][str(spec_id)]['transit_type_1']
-    # 在途PP(type=0)
-    pp_amount = transit_data[purchase_val][str(spec_id)]['transit_type_0']
-    return pp_amount, po_amount, cg_amount, fh_amount, trs_amount
+    # 数仓取值: 在途CG、在途FH、在途调拨(货物纬度), 全国取各仓库总和
+    # 数仓取值: 在途PO、在途PP(规格纬度), 全国取'-1'
+    transit_amount = 0
+    if type_val == 0:
+        # 在途PP(type=0)
+        if national_flag == 1:
+            wh_val = '-1'
+        else:
+            wh_val = str(wh_list[0])
+        for transit_dict in transit_data['type_0']:
+            spec_id = str(transit_dict['specId'])
+            if spec_id == str(spec_list[0]) and str(transit_dict['whDeptId']) == wh_val:
+                transit_amount = transit_dict['ztNum']
+                print('type_0', spec_id, transit_dict['whDeptId'], transit_dict['ztNum'])
+    elif type_val == 1:
+        # 在途PO(type=1)
+        if national_flag == 1:
+            wh_val = '-1'
+        else:
+            wh_val = str(wh_list[0])
+        for transit_dict in transit_data['type_1']:
+            spec_id = str(transit_dict['specId'])
+            if spec_id == str(spec_list[0]) and str(transit_dict['whDeptId']) == wh_val:
+                transit_amount = transit_dict['ztNum']
+                print('type_1', spec_id, transit_dict['whDeptId'], transit_dict['ztNum'])
+    elif type_val == 2:
+        # 在途CG(type=2)
+        for spec_val in spec_list:
+            for transit_val in transit_data['type_2']:
+                spec_id = str(transit_val['specId'])
+                if spec_id == str(spec_val) and transit_val['whDeptId'] in wh_list:
+                    transit_amount += transit_val['ztNum']
+                    print('type_2', spec_val, transit_val['whDeptId'], transit_val['ztNum'])
+    elif type_val == 3:
+        # 在途FH(type=3)
+        for spec_val in spec_list:
+            for transit_val in transit_data['type_3']:
+                spec_id = str(transit_val['specId'])
+                if spec_id == str(spec_val) and transit_val['whDeptId'] in wh_list:
+                    transit_amount += transit_val['ztNum']
+                    print('type_3', spec_val, transit_val['whDeptId'], transit_val['ztNum'])
+    elif type_val == 4:
+        # 在途调拨(type=4)
+        for spec_val in spec_list:
+            for transit_val in transit_data['type_4']:
+                spec_id = str(transit_val['specId'])
+                if spec_id == str(spec_val) and transit_val['whDeptId'] in wh_list:
+                    transit_amount += transit_val['ztNum']
+                    print('type_4', spec_val, transit_val['whDeptId'], transit_val['ztNum'])
+    return transit_amount
 
 
-def cul_current_stock(spec_id, wh_list):
+def cul_current_stock(spec_list: list, wh_list: list):
     # 日志关键词:【智慧订单】获取实时库存
     # 数仓取值: 当前库存
-    get_dict = {}
     stock_total = 0
-    for data_dict in stock_list:
-        if str(data_dict['specId']) == spec_id and data_dict['whDeptId'] in wh_list:
-            get_dict.update({data_dict['whDeptId']: data_dict['totalNum']})
-            stock_total += data_dict['totalNum']
-    return stock_total, get_dict
+    for spec_id in spec_list:
+        for data_dict in stock_list:
+            if str(data_dict['specId']) == str(spec_id) and data_dict['whDeptId'] in wh_list:
+                # print(spec_id, data_dict['whDeptId'], data_dict['totalNum'])
+                stock_total += data_dict['totalNum']
+    return stock_total
 
 
 def cul_pred_data(adjust_flag, goods_id, wh_id, mark_type, type_val, start_date, end_date):
@@ -308,6 +338,15 @@ def get_national_flag(goods_id):
     for val in wh_data:
         wh_list.append(val[0])
     wh_range = str(wh_list).replace('[', '(').replace(']', ')')
+    # 获取货物规格id
+    spec_list = []
+    cursor.execute(
+        sql_spec.format(goods_id)
+    )
+    spec_data = cursor.fetchall()
+    for spec_val in spec_data:
+        spec_list.append(spec_val[0])
+    print('货物规格:', spec_list)
     # 获取货物规格和供应商id
     cursor.execute(
         sql_spec_wh.format(goods_id, wh_range)
@@ -327,6 +366,14 @@ def get_national_flag(goods_id):
         spec_id = spec_val[0]
         supplier_id = spec_val[1]
         wh_list = spec_dict[spec_supplier]
+        # 当前库存(货物纬度)
+        current_stock = cul_current_stock(spec_list, wh_list)
+        # 在途数量
+        print(spec_list)
+        transit_cg = cul_transit_amount(2, spec_list, wh_list)
+        transit_fh = cul_transit_amount(3, spec_list, wh_list)
+        transit_trs = cul_transit_amount(4, spec_list, wh_list)
+        transit_amount = transit_cg + transit_fh + transit_trs
         # 查询用料单位换算采购单位
         cursor.execute(
             sql_purchase_ratio.format(spec_id)
@@ -347,24 +394,27 @@ def get_national_flag(goods_id):
                     '全国PO为"是"', '规格id:{}'.format(spec_id), '供应商id:{}'.format(supplier_id),
                     '仓库列表:{}'.format(wh_list), '\n'
                 )
-                cul_purchase_amount(goods_id, spec_id, purchase_ratio, wh_list, 1)
+                cul_purchase_amount(goods_id, current_stock, transit_amount, spec_id, purchase_ratio, wh_list, 1)
             else:
                 print(
                     '全国PO为"否"', '规格id:{}'.format(spec_id), '供应商id:{}'.format(supplier_id),
                     '仓库列表:{}'.format(wh_list), '\n'
                 )
-                cul_purchase_amount(goods_id, spec_id, purchase_ratio, wh_list, 0)
+                cul_purchase_amount(goods_id, current_stock, transit_amount, spec_id, purchase_ratio, wh_list, 0)
         else:
             print(
                 '全国PO为"否"', '规格id:{}'.format(spec_id), '供应商id:{}'.format(supplier_id),
                 '仓库列表:{}'.format(wh_list), '\n'
             )
-            cul_purchase_amount(goods_id, spec_id, purchase_ratio, wh_list, 0)
+            cul_purchase_amount(goods_id, current_stock, transit_amount, spec_id, purchase_ratio, wh_list, 0)
 
 
-def cul_purchase_amount(goods_id, spec_id, purchase_ratio, wh_list, national_flag, increment_num=2):
+def cul_purchase_amount(goods_id, current_stock, transit_amount,
+                        spec_id, purchase_ratio, wh_list, national_flag, increment_num=2):
     """
     :param goods_id: 货物id
+    :param current_stock: 货物当前库存
+    :param transit_amount: 在途库存-CG、FH、调拨(货物纬度)
     :param spec_id: 货物规格id
     :param purchase_ratio: 用料采购单位换算
     :param national_flag: 全国PO, 是-1, 否-0
@@ -395,31 +445,31 @@ def cul_purchase_amount(goods_id, spec_id, purchase_ratio, wh_list, national_fla
     pred_consume = cul_pred_consume(goods_id, wh_range, start_date, end_date)
     ss_cnt = cul_ss_cnt(increment_num, goods_id, wh_range)
     loss_amount = cul_loss_amount(goods_id, wh_range, start_date, end_date)
-    transit_list = cul_transit_amount(spec_id, national_flag, wh_list, increment_num)
-    transit_total = transit_list[0] + transit_list[1] + transit_list[2] + transit_list[3] + transit_list[4]
-    transit_amount1 = transit_list[2] + transit_list[3] + transit_list[4]
-    current_stock = cul_current_stock(spec_id, wh_list)
+    transit_po = cul_transit_amount(1, [spec_id], wh_list, national_flag)
+    transit_pp = cul_transit_amount(0, [spec_id], wh_list, national_flag)
+    transit_total = transit_pp + transit_po + transit_amount
 
     purchase_num, purchase_ratio_num = 0, 0
     if increment_num == 1:
-        # +1采购量 = T日至T+1月底的算法预估需求量 + SS1 + 预计损耗1 - 当前库存 - (在途CG/FH1 + 在途调拨1 + 在途PO1 + 在途PP1)
-        purchase_num = pred_consume + ss_cnt[0] + loss_amount[0] - current_stock[0] - transit_total
+        # +1采购量 = T日至T+1月底的算法预估需求量 + SS1 + 预计损耗1 - 当前库存 - (在途CG1 + 在途FH1 + 在途调拨1) - (在途PO1 + 在途PP1)
+        purchase_num = pred_consume + ss_cnt[0] + loss_amount[0] - current_stock - transit_total
         purchase_ratio_num = purchase_num / purchase_ratio
-        print('+1采购量 = T日至T+1月底的算法预估需求量 + SS1 + 预计损耗1 - 当前库存 - (在途CG/FH1 + 在途调拨1 + 在途PO1 + 在途PP1)')
+        print('+1采购量 = T日至T+1月底的算法预估需求量 + SS1 + 预计损耗1 - 当前库存 - (在途CG1 + 在途FH1 + 在途调拨1) - (在途PO1 + 在途PP1)')
         # print('+{}采购量(用料单位)'.format(increment_num), purchase_num)
         print('+{}采购量(采购单位)'.format(increment_num), purchase_ratio_num)
     elif increment_num == 2:
         purchase_amount1 = cul_purchase_amount(
-            goods_id, spec_id, purchase_ratio, wh_list,
+            goods_id, current_stock, transit_amount,
+            spec_id, purchase_ratio, wh_list,
             national_flag=national_flag,
             increment_num=1
         )
-        # +2采购量 = T日至T+2月底的算法预估需求量 + SS2 + 预计损耗2 - 当前库存 - (在途CG/FH2 + 在途调拨2 + 在途PO2 + 在途PP2) - (+1采购量)
-        purchase_num = pred_consume + ss_cnt[0] + loss_amount[0] - current_stock[0] - transit_total - purchase_amount1
+        # +2采购量 = T日至T+2月底的算法预估需求量 + SS2 + 预计损耗2 - 当前库存 - (在途CG2 + 在途FH2 + 在途调拨2) - (在途PO2 + 在途PP2) - (+1采购量)
+        purchase_num = pred_consume + ss_cnt[0] + loss_amount[0] - current_stock - transit_total - purchase_amount1
         # 用料单位换算采购单位
         purchase_ratio_num = purchase_num / purchase_ratio
         print(date_list)
-        print('+2采购量 = T日至T+2月底的算法预估需求量 + SS2 + 预计损耗2 - 当前库存 - (在途CG/FH2 + 在途调拨2 + 在途PO2 + 在途PP2) - (+1采购量)')
+        print('+2采购量 = T日至T+2月底的算法预估需求量 + SS2 + 预计损耗2 - 当前库存 - (在途CG2 + 在途FH2 + 在途调拨2) - (在途PO2 + 在途PP2) - (+1采购量)')
         # print('+{}采购量(用料单位)'.format(increment_num), purchase_num)
         print('+2采购量(采购单位)'.format(increment_num), purchase_ratio_num)
 
@@ -429,11 +479,11 @@ def cul_purchase_amount(goods_id, spec_id, purchase_ratio, wh_list, national_fla
     print(loss_amount[1])
     print('预计损耗{}'.format(increment_num), loss_amount[0])
     print('截止+{}损耗量(采购单位)'.format(increment_num), loss_amount[0] / purchase_ratio)
-    print('在途数量', transit_total)
-    print('截止+{}在途量(采购单位)'.format(increment_num), transit_amount1 / purchase_ratio)
-    print('截止+{}PO在途(采购单位)'.format(increment_num), transit_list[1] / purchase_ratio)
-    print(current_stock[1])
-    print('当前库存【期末可用库存】(采购单位)', current_stock[0] / purchase_ratio, '\n')
+    print('截止+{}在途量'.format(increment_num), transit_amount)
+    print('截止+{}在途量(采购单位)'.format(increment_num), transit_amount / purchase_ratio)
+    print('截止+{}PO在途(采购单位)'.format(increment_num), transit_po / purchase_ratio)
+    print('当前库存【期末可用库存】', current_stock)
+    print('当前库存【期末可用库存】(采购单位)', current_stock / purchase_ratio, '\n')
 
     # 全国需要各仓相加，不是取'-1'
     pred_new = cul_pred_data_total(0, goods_id, wh_list, 1, 18, start_date, end_date)
@@ -444,6 +494,7 @@ def cul_purchase_amount(goods_id, spec_id, purchase_ratio, wh_list, national_fla
     print('查询+{}周期常规品预测数据'.format(increment_num), pred_common/purchase_ratio)
     pred_common_adjust = cul_pred_data_total(1, goods_id, wh_list, 2, 19, start_date, end_date)
     print('查询调整后+{}周期常规品预测数据'.format(increment_num), pred_common_adjust/purchase_ratio, '\n')
+    print('---------------------------------------------------')
 
     return purchase_num
 

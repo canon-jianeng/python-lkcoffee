@@ -59,9 +59,23 @@ sql:
       FROM t_bi_wh_goods_spec_out_consume_d_his 
       WHERE goods_id={} AND wh_dept_id in {};"
     query_vlt: "SELECT po_vlt FROM t_bi_goods_spec_city_config WHERE goods_id={}"
-    query_spec: "SELECT DISTINCT goods_spec_id, supplier_id, wh_dept_id
+    query_spec_wh: "SELECT DISTINCT goods_spec_id, supplier_id, wh_dept_id
       FROM t_bi_goods_spec_city_config
       WHERE city_purchase_status=1 AND goods_id={} AND wh_dept_id in {}"
+    query_spec: "SELECT id FROM t_stock_goods_spec WHERE goods_id={}"
+    query_shop_consume: "SELECT IFNULL(SUM(pred_shop_consume), 0) 
+      FROM t_alg_new_demand_plan 
+      WHERE goods_id={} AND wh_dept_id={} AND predict_date >= '{}' AND predict_date <= '{}';"
+    query_wh_consume: "SELECT IFNULL(SUM(pred_wh_consume), 0) 
+      FROM t_alg_new_demand_plan 
+      WHERE goods_id={} AND wh_dept_id={} AND predict_date >= '{}' AND predict_date <= '{}';"
+    query_new: "SELECT IFNULL(wh_bp,0), IFNULL(shop_bp_ro,0), IFNULL(second_bp_po,0), 
+      IFNULL(coa,0), IFNULL(lt,0), IFNULL(pt,0), IFNULL(mt,0), IFNULL(wt,0) 
+      FROM t_new_stock_plan_warehouse 
+      WHERE material_id={} AND wh_dept_id={};"
+    query_scene: "SELECT IFNULL(scene_type, 0), commodity_plan_launch_dates 
+      FROM t_alg_new_warehouse_goods_online_scene 
+      WHERE goods_id={} AND wh_dept_id={} AND mark_type={}"
   other:
     query_pre_day: "SELECT id, pre_day FROM t_alg_warehouse_goods_stock_predict_result;"
     update_pre_day: "UPDATE t_alg_warehouse_goods_stock_predict_result SET pre_day='{}' WHERE id={};"

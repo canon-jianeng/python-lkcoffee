@@ -1,5 +1,28 @@
 
+import yaml
+import pymysql
 from lkcoffee_script import lk_tools
+
+
+with open('./sql.yml', encoding='utf-8') as f:
+    yml_data = yaml.load(f, Loader=yaml.CLoader)
+    mysql_sql = yml_data['sql']
+    mysql_conf = yml_data['mysql']
+
+# 打开数据库连接
+db_cooperation = pymysql.connect(
+    host=mysql_conf['cooperation']['host'],
+    user=mysql_conf['cooperation']['user'],
+    password=mysql_conf['cooperation']['pwd'],
+    database=mysql_conf['cooperation']['db'],
+    port=mysql_conf['cooperation']['port']
+)
+
+# 使用 cursor() 方法创建一个游标对象 cursor
+cursor = db_cooperation.cursor()
+
+sql_shop_consume = mysql_sql['cooperation']['query_shop_consume']
+sql_wh_consume = mysql_sql['cooperation']['query_wh_consume']
 
 
 def is_central_wh(wh_id, goods_id):
@@ -70,9 +93,19 @@ def nearly_new_goods_cense(scene, goods_id):
     return plan_date
 
 
-def cul_shop_consume(start_date, end_date):
-    return
+def cul_shop_consume(goods_id, wh_id, start_date, end_date):
+    # 门店消耗
+    cursor.execute(
+        sql_shop_consume.format(goods_id, wh_id, start_date, end_date)
+    )
+    shop_consume = cursor.fetchall()[0][0]
+    return shop_consume
 
 
-def cul_wh_out_num(start_date, end_date):
-    return
+def cul_wh_out_num(goods_id, wh_id, start_date, end_date):
+    # 仓库出库
+    cursor.execute(
+        sql_wh_consume.format(goods_id, wh_id, start_date, end_date)
+    )
+    wh_consume = cursor.fetchall()[0][0]
+    return wh_consume
