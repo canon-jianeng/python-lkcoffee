@@ -153,8 +153,9 @@ def cul_transit_amount(type_val: int, spec_list: list, wh_list: list, national_f
         for transit_dict in transit_data['type_0']:
             spec_id = str(transit_dict['specId'])
             if spec_id == str(spec_list[0]) and str(transit_dict['whDeptId']) == wh_val:
+                # print('在途PP(type=0)数量: {}'.format(transit_dict['ztNum']),
+                #       '规格id: {}'.format(spec_id), '仓库id: {}'.format(transit_dict['whDeptId']))
                 transit_amount = transit_dict['ztNum']
-                print('type_0', spec_id, transit_dict['whDeptId'], transit_dict['ztNum'])
     elif type_val == 1:
         # 在途PO(type=1)
         if national_flag == 1:
@@ -164,32 +165,36 @@ def cul_transit_amount(type_val: int, spec_list: list, wh_list: list, national_f
         for transit_dict in transit_data['type_1']:
             spec_id = str(transit_dict['specId'])
             if spec_id == str(spec_list[0]) and str(transit_dict['whDeptId']) == wh_val:
+                # print('在途PO(type=1)数量: {}'.format(transit_dict['ztNum']),
+                #       '规格id: {}'.format(spec_id), '仓库id: {}'.format(transit_dict['whDeptId']))
                 transit_amount = transit_dict['ztNum']
-                print('type_1', spec_id, transit_dict['whDeptId'], transit_dict['ztNum'])
     elif type_val == 2:
         # 在途CG(type=2)
         for spec_val in spec_list:
             for transit_val in transit_data['type_2']:
                 spec_id = str(transit_val['specId'])
                 if spec_id == str(spec_val) and transit_val['whDeptId'] in wh_list:
+                    print('在途CG(type=2)数量: {}'.format(transit_val['ztNum']),
+                          '规格id: {}'.format(spec_val), '仓库id: {}'.format(transit_val['whDeptId']))
                     transit_amount += transit_val['ztNum']
-                    print('type_2', spec_val, transit_val['whDeptId'], transit_val['ztNum'])
     elif type_val == 3:
         # 在途FH(type=3)
         for spec_val in spec_list:
             for transit_val in transit_data['type_3']:
                 spec_id = str(transit_val['specId'])
                 if spec_id == str(spec_val) and transit_val['whDeptId'] in wh_list:
+                    print('在途FH(type=3)数量: {}'.format(transit_val['ztNum']),
+                          '规格id: {}'.format(spec_val), '仓库id: {}'.format(transit_val['whDeptId']))
                     transit_amount += transit_val['ztNum']
-                    print('type_3', spec_val, transit_val['whDeptId'], transit_val['ztNum'])
     elif type_val == 4:
         # 在途调拨(type=4)
         for spec_val in spec_list:
             for transit_val in transit_data['type_4']:
                 spec_id = str(transit_val['specId'])
                 if spec_id == str(spec_val) and transit_val['whDeptId'] in wh_list:
+                    print('在途调拨(type=4)数量: {}'.format(transit_val['ztNum']),
+                          '规格id: {}'.format(spec_val), '仓库id: {}'.format(transit_val['whDeptId']))
                     transit_amount += transit_val['ztNum']
-                    print('type_4', spec_val, transit_val['whDeptId'], transit_val['ztNum'])
     return transit_amount
 
 
@@ -200,7 +205,8 @@ def cul_current_stock(spec_list: list, wh_list: list):
     for spec_id in spec_list:
         for data_dict in stock_list:
             if str(data_dict['specId']) == str(spec_id) and data_dict['whDeptId'] in wh_list:
-                # print(spec_id, data_dict['whDeptId'], data_dict['totalNum'])
+                print('当前库存(获取实时库存): {}'.format(data_dict['totalNum']),
+                      '规格id: {}'.format(spec_id), '仓库id: {}'.format(data_dict['whDeptId']))
                 stock_total += data_dict['totalNum']
     return stock_total
 
@@ -338,7 +344,7 @@ def get_national_flag(goods_id):
     for val in wh_data:
         wh_list.append(val[0])
     wh_range = str(wh_list).replace('[', '(').replace(']', ')')
-    # 获取货物规格id
+    # 获取货物的全部规格id
     spec_list = []
     cursor.execute(
         sql_spec.format(goods_id)
@@ -360,19 +366,30 @@ def get_national_flag(goods_id):
         else:
             spec_dict.update({spec_supplier: [data_val[2]]})
     print(spec_dict, '\n')
+    '''
+    场景1: 全国PO, 存在多个不同货物规格对应不同的供应商
+    例: 
+      1.规格: xcy咖啡豆1箱2000克(id: 301814), 对应供应商: SC004990
+      2.规格: xcy咖啡豆1000g(id: 306240), 对应供应商: SC202917
+    '''
     # 判断是否全国PO
     for spec_supplier in spec_dict.keys():
         spec_val = spec_supplier.split('_')
         spec_id = spec_val[0]
         supplier_id = spec_val[1]
         wh_list = spec_dict[spec_supplier]
+        '''
+        场景2: 存在同一个仓库，对应同一个货物的多个规格的数据
+        '''
         # 当前库存(货物纬度)
         current_stock = cul_current_stock(spec_list, wh_list)
-        # 在途数量
-        print(spec_list)
+        # 在途数量(货物纬度)
         transit_cg = cul_transit_amount(2, spec_list, wh_list)
+        print('在途CG总数量:', transit_cg)
         transit_fh = cul_transit_amount(3, spec_list, wh_list)
+        print('在途FH总数量:', transit_fh)
         transit_trs = cul_transit_amount(4, spec_list, wh_list)
+        print('在途调拨总数量:', transit_trs)
         transit_amount = transit_cg + transit_fh + transit_trs
         # 查询用料单位换算采购单位
         cursor.execute(
