@@ -475,12 +475,15 @@ def cul_purchase_amount(goods_id, current_stock, transit_amount,
         # print('+{}采购量(用料单位)'.format(increment_num), purchase_num)
         print('+{}采购量(采购单位)'.format(increment_num), purchase_ratio_num)
     elif increment_num == 2:
+        # 计算+1采购量
         purchase_amount1 = cul_purchase_amount(
             goods_id, current_stock, transit_amount,
             spec_id, purchase_ratio, wh_list,
             national_flag=national_flag,
             increment_num=1
         )
+        if purchase_amount1 < 0:
+            purchase_amount1 = 0
         # +2采购量 = T日至T+2月底的算法预估需求量 + SS2 + 预计损耗2 - 当前库存 - (在途CG2 + 在途FH2 + 在途调拨2) - (在途PO2 + 在途PP2) - (+1采购量)
         purchase_num = pred_consume + ss_cnt[0] + loss_amount[0] - current_stock - transit_total - purchase_amount1
         # 用料单位换算采购单位

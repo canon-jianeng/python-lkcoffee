@@ -16,3 +16,15 @@ sql:
     "SELECT rop, vlt, round(ceiling(safety_stock_adj/trans_ratio) * trans_ratio / avg_ss_dmd, 1)
     FROM t_dm_auto_cg_result 
     WHERE dt='{}' AND wh_dept_id={} AND goods_id={};"
+  query_central_use_day:
+    "SELECT cdc_wh_remain_days
+    FROM t_dm_auto_cg_result 
+    WHERE dt='{}' AND wh_dept_id={} AND goods_id={};"
+  query_auto_cg_large_class:
+    "SELECT DISTINCT large_class_code
+    FROM t_dm_auto_cg_result 
+    WHERE dt='{}' AND goods_id={};"
+  query_auto_cg_new:
+    "SELECT is_new_pur
+    FROM t_dm_auto_cg_result 
+    WHERE dt='{}' AND wh_dept_id={} AND goods_id={};"
