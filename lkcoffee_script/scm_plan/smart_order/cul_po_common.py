@@ -153,8 +153,8 @@ def cul_transit_amount(type_val: int, spec_list: list, wh_list: list, national_f
         for transit_dict in transit_data['type_0']:
             spec_id = str(transit_dict['specId'])
             if spec_id == str(spec_list[0]) and str(transit_dict['whDeptId']) == wh_val:
-                # print('在途PP(type=0)数量: {}'.format(transit_dict['ztNum']),
-                #       '规格id: {}'.format(spec_id), '仓库id: {}'.format(transit_dict['whDeptId']))
+                print('在途PP(type=0)数量: {}'.format(transit_dict['ztNum']),
+                      '规格id: {}'.format(spec_id), '仓库id: {}'.format(transit_dict['whDeptId']))
                 transit_amount = transit_dict['ztNum']
     elif type_val == 1:
         # 在途PO(type=1)
@@ -165,8 +165,8 @@ def cul_transit_amount(type_val: int, spec_list: list, wh_list: list, national_f
         for transit_dict in transit_data['type_1']:
             spec_id = str(transit_dict['specId'])
             if spec_id == str(spec_list[0]) and str(transit_dict['whDeptId']) == wh_val:
-                # print('在途PO(type=1)数量: {}'.format(transit_dict['ztNum']),
-                #       '规格id: {}'.format(spec_id), '仓库id: {}'.format(transit_dict['whDeptId']))
+                print('在途PO(type=1)数量: {}'.format(transit_dict['ztNum']),
+                      '规格id: {}'.format(spec_id), '仓库id: {}'.format(transit_dict['whDeptId']))
                 transit_amount = transit_dict['ztNum']
     elif type_val == 2:
         # 在途CG(type=2)
@@ -444,7 +444,7 @@ def cul_purchase_amount(goods_id, current_stock, transit_amount,
     if increment_num == 1:
         # 获取T日, T+0月最后一天
         date_list = get_date_range(0)
-        print(date_list)
+        print('+0采购量日期:', date_list)
         pred_consume = cul_pred_consume(goods_id, wh_range, date_list[0], date_list[1])
         print('T日至T+0月底的算法预估需求量', pred_consume)
         print('+0周期需求量(采购单位)', pred_consume/purchase_ratio, '\n')
@@ -464,15 +464,16 @@ def cul_purchase_amount(goods_id, current_stock, transit_amount,
     loss_amount = cul_loss_amount(goods_id, wh_range, start_date, end_date)
     transit_po = cul_transit_amount(1, [spec_id], wh_list, national_flag)
     transit_pp = cul_transit_amount(0, [spec_id], wh_list, national_flag)
-    transit_total = transit_pp + transit_po + transit_amount
+    transit_po_pp = transit_pp + transit_po
 
     purchase_num, purchase_ratio_num = 0, 0
     if increment_num == 1:
         # +1采购量 = T日至T+1月底的算法预估需求量 + SS1 + 预计损耗1 - 当前库存 - (在途CG1 + 在途FH1 + 在途调拨1) - (在途PO1 + 在途PP1)
-        purchase_num = pred_consume + ss_cnt[0] + loss_amount[0] - current_stock - transit_total
+        purchase_num = pred_consume + ss_cnt[0] + loss_amount[0] - current_stock - transit_amount - transit_po_pp
         purchase_ratio_num = purchase_num / purchase_ratio
+        print('+1采购量日期:', date_list)
         print('+1采购量 = T日至T+1月底的算法预估需求量 + SS1 + 预计损耗1 - 当前库存 - (在途CG1 + 在途FH1 + 在途调拨1) - (在途PO1 + 在途PP1)')
-        # print('+{}采购量(用料单位)'.format(increment_num), purchase_num)
+        print('+{}采购量(用料单位)'.format(increment_num), purchase_num)
         print('+{}采购量(采购单位)'.format(increment_num), purchase_ratio_num)
     elif increment_num == 2:
         # 计算+1采购量
@@ -484,13 +485,17 @@ def cul_purchase_amount(goods_id, current_stock, transit_amount,
         )
         if purchase_amount1 < 0:
             purchase_amount1 = 0
+        print('+1采购量:', purchase_amount1)
         # +2采购量 = T日至T+2月底的算法预估需求量 + SS2 + 预计损耗2 - 当前库存 - (在途CG2 + 在途FH2 + 在途调拨2) - (在途PO2 + 在途PP2) - (+1采购量)
-        purchase_num = pred_consume + ss_cnt[0] + loss_amount[0] - current_stock - transit_total - purchase_amount1
+        purchase_num = (pred_consume + ss_cnt[0] + loss_amount[0] - current_stock
+                        - transit_amount - transit_po_pp - purchase_amount1)
+        if purchase_num < 0:
+            purchase_num = 0
         # 用料单位换算采购单位
         purchase_ratio_num = purchase_num / purchase_ratio
-        print(date_list)
+        print('+2采购量日期:', date_list)
         print('+2采购量 = T日至T+2月底的算法预估需求量 + SS2 + 预计损耗2 - 当前库存 - (在途CG2 + 在途FH2 + 在途调拨2) - (在途PO2 + 在途PP2) - (+1采购量)')
-        # print('+{}采购量(用料单位)'.format(increment_num), purchase_num)
+        print('+{}采购量(用料单位)'.format(increment_num), purchase_num)
         print('+2采购量(采购单位)'.format(increment_num), purchase_ratio_num)
 
     print('T日至T+{}月底的算法预估需求量'.format(increment_num), pred_consume)
