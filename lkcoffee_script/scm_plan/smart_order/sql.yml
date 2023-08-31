@@ -12,11 +12,18 @@ mysql:
     user: "srmservice_w"
     pwd: "tTPt33ikr8BrY6Mi"
     db: "lucky_srm"
+  dm:
+    host: "10.218.2.12"
+    port: 3306
+    user: "dataplatform_w"
+    pwd: "WhFtjxAYkzZJF2Qd"
+    db: "lucky_dataplatform"
 
 
 sql:
   srm:
-    query_national_price: "SELECT quotationDetail.city_id, quotationDetail.unified_national_price, quotationDetail.create_time
+    query_national_price:
+      "SELECT quotationDetail.city_id, quotationDetail.unified_national_price, quotationDetail.create_time
       from t_enquire_price_quotation_detail quotationDetail
       left join t_product_requirement product on quotationDetail.product_id = product.id
       left join t_enterprise_info enterprise on quotationDetail.enterprise_id = enterprise.id
@@ -27,55 +34,97 @@ sql:
       WHERE quotationDetail.`status`=10 AND quotationDetail.effective_status=20 AND goodsSpec.id={} AND supplier.id={}
       ORDER BY quotationDetail.create_time DESC"
   cooperation:
-    query_pred_consume: "SELECT wh_dept_id, SUM(pred_wh_consume)
+    query_pred_consume:
+      "SELECT wh_dept_id, SUM(pred_wh_consume)
       FROM t_alg_coffee_factory_demand_plan
       WHERE goods_id={} AND wh_dept_id in {} AND predict_date>='{}' AND predict_date<='{}'
       GROUP BY wh_dept_id"
-    query_ss_cnt: "SELECT wh_dept_id, {} 
+    query_ss_cnt:
+      "SELECT wh_dept_id, {} 
       FROM t_alg_monthly_purchase_plan_safety_stock
       WHERE goods_id={} AND wh_dept_id in {}"
-    query_loss_amount: "SELECT wh_dept_id, SUM(batch_loss_amount) 
+    query_loss_amount:
+      "SELECT wh_dept_id, SUM(batch_loss_amount) 
       FROM t_alg_warehouse_goods_stock_predict_result
       WHERE goods_id={} AND wh_dept_id in {} AND pre_day>='{}' AND pre_day<='{}'
       GROUP BY wh_dept_id"
-    query_wh: "SELECT department_id
+    query_wh:
+      "SELECT department_id
       FROM t_stock_warehouse
       WHERE info_status=1 AND deleted=0 AND org_code='0101' AND warehouse_type=1 AND `status`!=3"
-    query_purchase_ratio: "SELECT `purchase_use_ratio`, `buy_purchase_ratio`
+    query_purchase_ratio:
+      "SELECT `purchase_use_ratio`, `buy_purchase_ratio`
       FROM lucky_stock.t_stock_goods_spec
       WHERE `id`={};"
-    query_pred_v0: "SELECT goods.`id`
+    query_pred_v0:
+      "SELECT goods.`id`
       FROM t_version_prediction ver
       LEFT JOIN t_prediction_cup_goods goods ON ver.`id`=goods.version_id
       WHERE ver.`year`='{}' AND ver.`type`=20 AND ver.version_num=0 AND ver.deleted=0 AND goods.goods_id={} AND goods.wh_dept_id='{}';"
-    query_pred_definite: "SELECT goods.`id`
+    query_pred_definite:
+      "SELECT goods.`id`
       FROM t_version_prediction ver
       LEFT JOIN t_prediction_cup_goods goods ON ver.`id`=goods.version_id
       WHERE ver.`year`='{}' AND ver.`type`=20 AND ver.definite_flag=1 AND ver.deleted=0 AND goods.goods_id={} AND goods.wh_dept_id='{}';"
-    query_pred_amount: "SELECT SUM(cup_amount) 
+    query_pred_amount:
+      "SELECT SUM(cup_amount) 
       FROM t_prediction_cup_goods_day_detail 
       WHERE cup_goods_id = {} AND mark_type = {}  AND type = {} AND record_date >= '{}' AND record_date <= '{}';"
-    query_day_consume: "SELECT consume_7d, consume_14d, consume_21d , consume_28d
+    query_day_consume:
+      "SELECT consume_7d, consume_14d, consume_21d , consume_28d
       FROM t_bi_wh_goods_spec_out_consume_d_his 
       WHERE goods_id={} AND wh_dept_id in {};"
-    query_vlt: "SELECT po_vlt FROM t_bi_goods_spec_city_config WHERE goods_id={}"
-    query_spec_wh: "SELECT DISTINCT goods_spec_id, supplier_id, wh_dept_id
+    query_vlt:
+      "SELECT po_vlt FROM t_bi_goods_spec_city_config WHERE goods_id={}"
+    query_spec_wh:
+      "SELECT goods_spec_id, supplier_id, wh_dept_id
       FROM t_bi_goods_spec_city_config
       WHERE city_purchase_status=1 AND goods_id={} AND wh_dept_id in {}"
-    query_spec: "SELECT id FROM t_stock_goods_spec WHERE goods_id={}"
-    query_shop_consume: "SELECT IFNULL(SUM(pred_shop_consume), 0) 
+    query_spec_version:
+      "SELECT IFNULL(version, '')
+      FROM t_bi_goods_spec_city_config
+      WHERE goods_spec_id={} AND wh_dept_id={}"
+    query_spec_replace:
+      "SELECT goods_id, goods_spec_id, wh_dept_id
+      FROM t_bi_goods_spec_city_config
+      WHERE version='{}'"
+    query_spec:
+      "SELECT id FROM t_stock_goods_spec WHERE goods_id={}"
+    query_shop_consume:
+      "SELECT IFNULL(SUM(pred_shop_consume), 0) 
       FROM t_alg_new_demand_plan 
       WHERE goods_id={} AND wh_dept_id={} AND predict_date >= '{}' AND predict_date <= '{}';"
-    query_wh_consume: "SELECT IFNULL(SUM(pred_wh_consume), 0) 
+    query_wh_consume:
+      "SELECT IFNULL(SUM(pred_wh_consume), 0) 
       FROM t_alg_new_demand_plan 
       WHERE goods_id={} AND wh_dept_id={} AND predict_date >= '{}' AND predict_date <= '{}';"
-    query_new: "SELECT IFNULL(wh_bp,0), IFNULL(shop_bp_ro,0), IFNULL(second_bp_po,0), 
-      IFNULL(coa,0), IFNULL(lt,0), IFNULL(pt,0), IFNULL(mt,0), IFNULL(wt,0) 
-      FROM t_new_stock_plan_warehouse 
-      WHERE material_id={} AND wh_dept_id={};"
-    query_scene: "SELECT IFNULL(scene_type, 0), commodity_plan_launch_dates 
-      FROM t_alg_new_warehouse_goods_online_scene 
+    query_new_scene:
+      "SELECT IFNULL(scene_type, 0), commodity_plan_launch_dates 
+      FROM t_bi_new_warehouse_goods_online_scene 
       WHERE goods_id={} AND wh_dept_id={} AND mark_type={}"
+    query_po_new_param:
+      "SELECT IFNULL(wh_bp,0), IFNULL(coa,0), IFNULL(lt,0), IFNULL(pt,0), IFNULL(mt,0)
+      FROM t_new_stock_parameter 
+      WHERE material_id={} AND wh_dept_id=-1 AND material_type={};"
+    query_po_new_wh_param:
+      "SELECT IFNULL(shop_bp_ro,0), IFNULL(bp_po,0), IFNULL(wt,0)
+      FROM t_new_stock_parameter 
+      WHERE material_id={} AND wh_dept_id={} AND material_type={};"
+    query_po_sub_new_param:
+      "SELECT IFNULL(vlt_po,0), IFNULL(ss_po,0), IFNULL(second_bp_po,0)
+      FROM t_new_stock_parameter 
+      WHERE material_id={} AND wh_dept_id=-1 AND material_type={};"
+    query_po_sub_new_wh_param:
+      "SELECT IFNULL(wt,0)
+      FROM t_new_stock_parameter 
+      WHERE material_id={} AND wh_dept_id={} AND material_type={};"
+    query_large_class_id:
+      "SELECT large_class FROM t_stock_goods WHERE id={};"
+  dm:
+    query_central_data:
+      "SELECT config_data FROM t_dp_config WHERE config_name='自动CG仓货模式配置';"
   other:
-    query_pre_day: "SELECT id, pre_day FROM t_alg_warehouse_goods_stock_predict_result;"
-    update_pre_day: "UPDATE t_alg_warehouse_goods_stock_predict_result SET pre_day='{}' WHERE id={};"
+    query_pre_day:
+      "SELECT id, pre_day FROM t_alg_warehouse_goods_stock_predict_result;"
+    update_pre_day:
+      "UPDATE t_alg_warehouse_goods_stock_predict_result SET pre_day='{}' WHERE id={};"

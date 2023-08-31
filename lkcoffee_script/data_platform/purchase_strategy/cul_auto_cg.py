@@ -62,7 +62,7 @@ def cul_result(goods_id, wh_id, use_days):
 
 def get_use_day(goods_id, wh_id):
     cursor.execute(
-        sql_central_use_day.format(now_date, wh_id, goods_id)
+        sql_use_day.format(now_date, wh_id, goods_id)
     )
     use_day = cursor.fetchall()[0][0]
     return use_day
@@ -77,8 +77,9 @@ def get_ro_ss_vlt(goods_id, wh_id):
     data = cursor.fetchall()[0]
     ro = int(data[0])
     vlt = int(data[1])
-    ss = int(data[2])
-    return ro, vlt, ss
+    vlt_adj = int(data[2])
+    ss = int(data[3])
+    return ro, vlt, vlt_adj, ss
 
 
 def get_central_days(goods_id, wh_id):
@@ -88,7 +89,7 @@ def get_central_days(goods_id, wh_id):
     )
     sql_data = cursor.fetchall()
     if sql_data == () and sql_data is None:
-        return ''
+        return None
     else:
         return sql_data[0][0]
 
@@ -118,11 +119,11 @@ def cul_plan_finish_date(goods_id, wh_id, central_flag):
     large_class = get_large_class(goods_id)
     central_use_day = get_central_days(goods_id, wh_id)
     print('中心仓可用天数: {}'.format(central_use_day))
-    use_day = get_use_day(goods_id, wh_id)
+    use_day = int(get_use_day(goods_id, wh_id))
     print('可用天数: {}'.format(use_day))
     goods_new_flag = is_goods_new(goods_id, wh_id)
-    ro, vlt, ss = get_ro_ss_vlt(goods_id, wh_id)
-    print('RO: {}, VLT: {}, SS: {}'.format(ro, vlt, ss))
+    ro, vlt, vlt_adj, ss = get_ro_ss_vlt(goods_id, wh_id)
+    print('RO: {}, VLT: {}, 调整后VLT: {}, SS: {}'.format(ro, vlt, vlt_adj, ss))
     print('下次调拨日: {}, 下下次调拨日: {}'.format(next_transit_date, two_more_transit_date), '\n')
 
     if goods_new_flag:
@@ -130,7 +131,7 @@ def cul_plan_finish_date(goods_id, wh_id, central_flag):
         pass
     else:
         # 非新品，则【计划完成日期】和【最晚计划完成日期】需要重新计算
-        if central_flag == 1 and large_class == 'SC0003' and central_use_day != '':
+        if central_flag == 1 and large_class == 'SC0003' and central_use_day is not None:
             # 仓库为中心仓 且 货物为中心仓模式, 货物大类为"轻食"（大类编号：SC0003）
             # 【当前日】+ 中心仓可用天数 ＜【下次调拨日】，则 计划完成日期 = 当前日 + 中心仓可用天数
             result_day = lk_tools.datetool.cul_days(now_date, next_transit_date)
@@ -138,7 +139,7 @@ def cul_plan_finish_date(goods_id, wh_id, central_flag):
             print('场景1:【当前日】+ 中心仓可用天数 ＜【下次调拨日】，则 计划完成日期 = 当前日 + 中心仓可用天数')
             if central_use_day < result_day:
                 plan_finish_date = lk_tools.datetool.cul_date(now_date, central_use_day)
-                print('计划完成日期:', plan_finish_date, '\n')
+                print('计划完成日期:', plan_finish_date)
                 print('最晚计划完成日期:', plan_finish_date, '\n')
 
             # 【下次调拨日】 ≤ 【当前日】+ 中心仓可用天数 ＜ 【下下次调拨日】，则 计划完成日期 = 当前日 + 中心仓可用天数 - RO
@@ -146,9 +147,9 @@ def cul_plan_finish_date(goods_id, wh_id, central_flag):
             result_day_right = lk_tools.datetool.cul_days(now_date, two_more_transit_date)
             print(result_day_left, '<= 中心仓可用天数 <', result_day_right)
             print('场景2:【下次调拨日】 ≤ 【当前日】+ 中心仓可用天数 ＜ 【下下次调拨日】，则 计划完成日期 = 当前日 + 中心仓可用天数 - RO')
-            if result_day_left <= central_use_day <= result_day_right:
+            if result_day_left <= central_use_day < result_day_right:
                 plan_finish_date = lk_tools.datetool.cul_date(now_date, central_use_day - ro)
-                print('计划完成日期:', plan_finish_date, '\n')
+                print('计划完成日期:', plan_finish_date)
                 print('最晚计划完成日期:', plan_finish_date, '\n')
 
             # 【下下次调拨日】 ≤ 【当前日】+ 中心仓可用天数 ＜ 【下下次调拨日】+RO+SS，则 计划完成日期 = 当前日 + VLT
@@ -157,9 +158,9 @@ def cul_plan_finish_date(goods_id, wh_id, central_flag):
             result_day_right = lk_tools.datetool.cul_days(now_date, res_date)
             print(result_day_left, '<= 中心仓可用天数 <', result_day_right)
             print('场景3:【下下次调拨日】 ≤ 【当前日】+ 中心仓可用天数 ＜ 【下下次调拨日】+RO+SS，则 计划完成日期 = 当前日 + VLT')
-            if result_day_left <= central_use_day <= result_day_right:
-                plan_finish_date = lk_tools.datetool.cul_date(now_date, vlt)
-                print('计划完成日期:', plan_finish_date, '\n')
+            if result_day_left <= central_use_day < result_day_right:
+                plan_finish_date = lk_tools.datetool.cul_date(now_date, vlt_adj)
+                print('计划完成日期:', plan_finish_date)
                 print('最晚计划完成日期:', plan_finish_date, '\n')
 
             # 【当前日】+ 中心仓可用天数 ≥ 【下下次调拨日】+RO+SS，则 计划完成日期 = 当前日 + 中心仓可用天数 - RO - SS
@@ -168,9 +169,9 @@ def cul_plan_finish_date(goods_id, wh_id, central_flag):
             print('场景4:【当前日】+ 中心仓可用天数 ≥【下下次调拨日】+RO+SS，则 计划完成日期 = 当前日 + 中心仓可用天数 - RO - SS')
             if result_day <= central_use_day:
                 plan_finish_date = lk_tools.datetool.cul_date(now_date, central_use_day - ro - ss)
-                print('计划完成日期:', plan_finish_date, '\n')
+                print('计划完成日期:', plan_finish_date)
                 print('最晚计划完成日期:', plan_finish_date, '\n')
-        elif central_flag == 1 and large_class != 'SC0003' and central_use_day != '':
+        elif central_flag == 1 and large_class != 'SC0003' and central_use_day is not None:
             # 仓库为中心仓 且 货物为中心仓模式, 货物大类为非"轻食"（大类编号：SC0003）
             # 中心仓可用天数 - RO ＜ VLT 时, 计划完成日期 = 当前日 + max(7, 中心仓可用天数-RO)
             result_day = ro + vlt
@@ -178,80 +179,112 @@ def cul_plan_finish_date(goods_id, wh_id, central_flag):
             print('场景1: 中心仓可用天数 - RO ＜ VLT 时, 计划完成日期 = 当前日 + max(7, 中心仓可用天数-RO)')
             if central_use_day < result_day:
                 plan_finish_date = lk_tools.datetool.cul_date(now_date, max(7, central_use_day-ro))
-                print('计划完成日期:', plan_finish_date, '\n')
+                print('计划完成日期:', plan_finish_date)
                 print('最晚计划完成日期:', plan_finish_date, '\n')
 
             # 中心仓可用天数 - RO ≥  VLT
             print('中心仓可用天数 >=', result_day)
             if central_use_day >= result_day:
-                if large_class in ['', '', '', '', '']:
+                if large_class in ['SC0002', 'SC0014', 'SC0001', 'SC0013', 'SC0007']:
                     # "货物大类" 为器具、日耗、办公用品、工服、营销物料，则 计划完成日期 = 当前日 + VLT天数
-                    plan_finish_date = lk_tools.datetool.cul_date(now_date, vlt)
-                    print('计划完成日期:', plan_finish_date, '\n')
+                    plan_finish_date = lk_tools.datetool.cul_date(now_date, vlt_adj)
+                    print('场景2-1: "货物大类" 为器具、日耗、办公用品、工服、营销物料，则 计划完成日期 = 当前日 + VLT天数')
+                    print('计划完成日期:', plan_finish_date)
                     print('最晚计划完成日期:', plan_finish_date, '\n')
                 else:
-                    # 【中心仓可用天数】-RO-SS ＜ VLT，则 计划完成日期 = 当前日 + VLT天数
+                    # 最晚计划完成日期 = 当前日 + 可用天数 - RO
+                    last_plan_finish_date = lk_tools.datetool.cul_date(now_date, central_use_day - ro)
+                    # 中心仓可用天数 - RO - SS ＜ VLT，则 计划完成日期 = 当前日 + VLT天数
                     result_day = vlt + ro + ss
                     print('中心仓可用天数 < ', result_day)
+                    print('场景2-2: 中心仓可用天数 - RO - SS ＜ VLT，则 计划完成日期 = 当前日 + VLT天数')
                     if central_use_day < result_day:
-                        plan_finish_date = lk_tools.datetool.cul_date(now_date, vlt)
-                        print('计划完成日期:', plan_finish_date, '\n')
-                        print('最晚计划完成日期:', plan_finish_date, '\n')
+                        plan_finish_date = lk_tools.datetool.cul_date(now_date, vlt_adj)
+                        print('计划完成日期:', plan_finish_date)
+                        print('最晚计划完成日期:', last_plan_finish_date, '\n')
 
                     # 中心仓可用天数 - RO - SS  ≥ VLT，则 计划完成日期 = 当前日 + 中心仓可用天数 -RO - SS
                     print('中心仓可用天数 >=', result_day)
+                    print('场景2-3: 中心仓可用天数 - RO - SS  ≥ VLT，则 计划完成日期 = 当前日 + 中心仓可用天数 -RO - SS')
                     if central_use_day >= result_day:
                         plan_finish_date = lk_tools.datetool.cul_date(now_date, central_use_day - ro - ss)
-                        print('计划完成日期:', plan_finish_date, '\n')
-                        print('最晚计划完成日期:', plan_finish_date, '\n')
+                        print('计划完成日期:', plan_finish_date)
+                        print('最晚计划完成日期:', last_plan_finish_date, '\n')
         else:
             # 可用天数 - RO ＜ VLT，则 计划完成日期 = 当前日 + max(7, 可用天数-RO)
             result_vlt = use_day - ro
             print('vlt调整值 >', result_vlt - vlt)
-            print('可用天数 - RO ＜ VLT，则 计划完成日期 = 当前日 + max(7, 可用天数-RO)')
-            if result_vlt < vlt:
+            print('场景1: 可用天数 - RO ＜ VLT，则 计划完成日期 = 当前日 + max(7, 可用天数-RO)')
+            if result_vlt < vlt_adj:
                 plan_finish_date = lk_tools.datetool.cul_date(now_date, max(7, use_day-ro))
-                print('计划完成日期:', plan_finish_date, '\n')
+                print('计划完成日期:', plan_finish_date)
                 print('最晚计划完成日期:', plan_finish_date, '\n')
 
             # 可用天数 - RO ≥  VLT
             print('vlt调整值 <=', result_vlt - vlt)
-            if result_vlt >= vlt:
-                if large_class in ['', '', '', '', '']:
+            if result_vlt >= vlt_adj:
+                if large_class in ['SC0002', 'SC0014', 'SC0001', 'SC0013', 'SC0007']:
                     # "货物大类" 为器具、日耗、办公用品、工服、营销物料，则 计划完成日期 = 当前日 + VLT天数
-                    plan_finish_date = lk_tools.datetool.cul_date(now_date, vlt)
-                    print('计划完成日期:', plan_finish_date, '\n')
+                    plan_finish_date = lk_tools.datetool.cul_date(now_date, vlt_adj)
+                    print('场景2-1: "货物大类" 为器具、日耗、办公用品、工服、营销物料，则 计划完成日期 = 当前日 + VLT天数')
+                    print('计划完成日期:', plan_finish_date)
                     print('最晚计划完成日期:', plan_finish_date, '\n')
                 else:
                     # 最晚计划完成日期 = 当前日 + 可用天数 - RO
                     last_plan_finish_date = lk_tools.datetool.cul_date(now_date, use_day - ro)
                     # 可用天数 - RO - SS ＜ VLT，则 计划完成日期 = 当前日 + VLT天数
-                    result_vlt = vlt + ro + ss
-                    print('vlt调整值 >', result_vlt - vlt)
-                    if result_vlt < vlt:
-                        plan_finish_date = lk_tools.datetool.cul_date(now_date, vlt)
-                        print('计划完成日期:', plan_finish_date, '\n')
+                    result_vlt2 = vlt + ro + ss
+                    print('vlt调整值 >', result_vlt2 - vlt)
+                    print('场景2-2: 可用天数 - RO - SS ＜ VLT，则 计划完成日期 = 当前日 + VLT天数')
+                    if result_vlt2 < vlt_adj:
+                        plan_finish_date = lk_tools.datetool.cul_date(now_date, vlt_adj)
+                        print('计划完成日期:', plan_finish_date)
                         print('最晚计划完成日期:', last_plan_finish_date, '\n')
 
                     # 可用天数 - RO - SS ≥ VLT，则 计划完成日期 = 当前日 + 可用天数 - RO - SS
-                    print('vlt调整值 <=', result_vlt - vlt)
-                    if result_vlt >= vlt:
+                    print('vlt调整值 <=', result_vlt2 - vlt)
+                    print('场景2-3: 可用天数 - RO - SS ≥ VLT，则 计划完成日期 = 当前日 + 可用天数 - RO - SS')
+                    if result_vlt2 >= vlt_adj:
                         plan_finish_date = lk_tools.datetool.cul_date(now_date, use_day - ro - ss)
-                        print('计划完成日期:', plan_finish_date, '\n')
+                        print('计划完成日期:', plan_finish_date)
                         print('最晚计划完成日期:', last_plan_finish_date, '\n')
 
 
 if __name__ == '__main__':
-    # 仓库为中心仓 且 货物为中心仓模式
+    # 仓库为中心仓 且 货物为中心仓模式, 货物大类: 轻食
     # 武汉仓库
     wh_dept_id = 22001
     # 海盐芝士厚切吐司
     good_id = 13729
+    print('仓库: {}, 货物: {}'.format('武汉仓库', '海盐芝士厚切吐司'))
     cul_plan_finish_date(good_id, wh_dept_id, 1)
 
-    # 仓库为非中心仓 且 货物为非中心仓模式
-    # 广州仓库
-    wh_dept_id = 4001
-    # 原味调味糖浆
-    good_id = 4488
-    cul_plan_finish_date(good_id, wh_dept_id, 0)
+    # 仓库为中心仓 且 货物为中心仓模式, 货物大类: 原料(非轻食)
+    # # 北京仓库
+    # wh_dept_id = 4001
+    # # 原味调味糖浆
+    # good_id = 4488
+    # print('仓库: {}, 货物: {}'.format('北京仓库', '原味调味糖浆'))
+    # cul_plan_finish_date(good_id, wh_dept_id, 1)
+
+    # 仓库为中心仓 且 货物为中心仓模式, 货物大类: 器具类
+    # # 北京仓库
+    # wh_dept_id = 4001
+    # # 拖布头
+    # good_id = 130
+    # print('仓库: {}, 货物: {}'.format('北京仓库', '拖布头'))
+    # cul_plan_finish_date(good_id, wh_dept_id, 1)
+
+    # 仓库为非中心仓 或 货物为非中心仓模式
+    # # 广州仓库
+    # wh_dept_id = 21701
+    # # 原味调味糖浆
+    # good_id = 4488
+    # cul_plan_finish_date(good_id, wh_dept_id, 0)
+
+    # 仓库为中心仓 且 货物为中心仓模式, 货物大类: 器具类
+    # # 广州仓库
+    # wh_dept_id = 21701
+    # # 拖布头
+    # good_id = 130
+    # cul_plan_finish_date(good_id, wh_dept_id, 0)
