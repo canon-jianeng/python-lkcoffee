@@ -1,158 +1,33 @@
 
 # 实时库存
 stock_list = [
-    {
-        "availableNum": 59000.00,
-        "quarantineNum": 0.00,
-        "specId": 365937,
-        "totalNum": 5900.00,
-        "whDeptId": 245971
-    },
-    {
-        "availableNum": 19000.00,
-        "quarantineNum": 7000.00,
-        "specId": 328428,
-        "totalNum": 2600.00,
-        "whDeptId": 327193
-    },
-    {
-        "availableNum": 27000.00,
-        "quarantineNum": 0.00,
-        "specId": 364936,
-        "totalNum": 2700.00,
-        "whDeptId": 327193
-    },
-    {
-        "availableNum": 11000.00,
-        "quarantineNum": 0.00,
-        "specId": 301814,
-        "totalNum": 1100.00,
-        "whDeptId": 245971
-    },
-    {
-        "availableNum": 32000.00,
-        "quarantineNum": 0.00,
-        "specId": 364936,
-        "totalNum": 3200.00,
-        "whDeptId": 245770
-    },
-    {
-        "availableNum": 55000.00,
-        "quarantineNum": 7000.00,
-        "specId": 365937,
-        "totalNum": 6200.00,
-        "whDeptId": 245871
-    },
-    {
-        "availableNum": 19000.00,
-        "quarantineNum": 0.00,
-        "specId": 306240,
-        "totalNum": 1900.00,
-        "whDeptId": 326932
-    },
-    {
-        "availableNum": 10000.00,
-        "quarantineNum": 0.00,
-        "specId": 301814,
-        "totalNum": 1000.00,
-        "whDeptId": 327193
-    },
-    {
-        "availableNum": 22000.00,
-        "quarantineNum": 0.00,
-        "specId": 328428,
-        "totalNum": 2200.00,
-        "whDeptId": 245871
-    },
-    {
-        "availableNum": 30000.00,
-        "quarantineNum": 0.00,
-        "specId": 364936,
-        "totalNum": 3000.00,
-        "whDeptId": 326932
-    },
-    {
-        "availableNum": 20000.00,
-        "quarantineNum": 0.00,
-        "specId": 306240,
-        "totalNum": 2000.00,
-        "whDeptId": 245770
-    },
-    {
-        "availableNum": 12000.00,
-        "quarantineNum": 0.00,
-        "specId": 364742,
-        "totalNum": 1200.00,
-        "whDeptId": 245871
-    },
-    {
-        "availableNum": 61000.00,
-        "quarantineNum": 0.00,
-        "specId": 365937,
-        "totalNum": 6100.00,
-        "whDeptId": 245770
-    },
-    {
-        "availableNum": 29000.00,
-        "quarantineNum": 0.00,
-        "specId": 364936,
-        "totalNum": 2900.00,
-        "whDeptId": 245871
-    },
-    {
-        "availableNum": 23000.00,
-        "quarantineNum": 0.00,
-        "specId": 328428,
-        "totalNum": 2300.00,
-        "whDeptId": 326932
-    },
-    {
-        "availableNum": 12000.00,
-        "quarantineNum": 0.00,
-        "specId": 301814,
-        "totalNum": 1200.00,
-        "whDeptId": 245871
-    },
-    {
-        "availableNum": 660.00,
-        "quarantineNum": 0.00,
-        "specId": 306240,
-        "totalNum": 660.00,
-        "whDeptId": 245871
-    },
-    {
-        "availableNum": 25000.00,
-        "quarantineNum": 0.00,
-        "specId": 328428,
-        "totalNum": 2500.00,
-        "whDeptId": 245770
-    },
-    {
-        "availableNum": 58000.00,
-        "quarantineNum": 0.00,
-        "specId": 365937,
-        "totalNum": 5800.00,
-        "whDeptId": 326932
-    },
-    {
-        "availableNum": 20000.00,
-        "quarantineNum": 8000.00,
-        "specId": 364936,
-        "totalNum": 2800.00,
-        "whDeptId": 245971
-    },
-    {
-        "availableNum": 600.00,
-        "quarantineNum": 0.00,
-        "specId": 364742,
-        "totalNum": 600.00,
-        "whDeptId": 245971
-    },
-    {
-        "availableNum": 21000.00,
-        "quarantineNum": 0.00,
-        "specId": 328428,
-        "totalNum": 2100.00,
-        "whDeptId": 245971
-    }
+    {"availableNum": 27000.00, "quarantineNum": 0.00, "specId": 364936, "totalNum": 2700.00, "whDeptId": 327193},
+    {"availableNum": 11000.00, "quarantineNum": 0.00, "specId": 301814, "totalNum": 1100.00, "whDeptId": 245971},
+    {"availableNum": 61000.00, "quarantineNum": 0.00, "specId": 365937, "totalNum": 6100.00, "whDeptId": 245770},
+    {"availableNum": 29000.00, "quarantineNum": 0.00, "specId": 364936, "totalNum": 2900.00, "whDeptId": 245871},
+    {"availableNum": 23000.00, "quarantineNum": 0.00, "specId": 328428, "totalNum": 2300.00, "whDeptId": 326932},
+    {"availableNum": 12000.00, "quarantineNum": 0.00, "specId": 301814, "totalNum": 1200.00, "whDeptId": 245871},
+    {"availableNum": 660.00, "quarantineNum": 0.00, "specId": 306240, "totalNum": 660.00, "whDeptId": 245871},
+    {"availableNum": 25000.00, "quarantineNum": 0.00, "specId": 328428, "totalNum": 2500.00, "whDeptId": 245770},
+    {"availableNum": 58000.00, "quarantineNum": 0.00, "specId": 365937, "totalNum": 5800.00, "whDeptId": 326932},
+    {"availableNum": 32000.00, "quarantineNum": 0.00, "specId": 364936, "totalNum": 3200.00, "whDeptId": 245770},
+    {"availableNum": 55000.00, "quarantineNum": 7000.00, "specId": 365937, "totalNum": 6200.00, "whDeptId": 245871},
+    {"availableNum": 19000.00, "quarantineNum": 0.00, "specId": 306240, "totalNum": 1900.00, "whDeptId": 326932},
+    {"availableNum": 10.00, "quarantineNum": 0.00, "specId": 364752, "totalNum": 1000.00, "whDeptId": 327193},
+    {"availableNum": 59000.00, "quarantineNum": 0.00, "specId": 365937, "totalNum": 5900.00, "whDeptId": 245971},
+    {"availableNum": 19000.00, "quarantineNum": 7000.00, "specId": 328428, "totalNum": 2600.00, "whDeptId": 327193},
+    {"availableNum": 50.00, "quarantineNum": 0.00, "specId": 365908, "totalNum": 1000.00, "whDeptId": 245770},
+    {"availableNum": 20000.00, "quarantineNum": 8000.00, "specId": 364936, "totalNum": 2800.00, "whDeptId": 245971},
+    {"availableNum": 120.00, "quarantineNum": 0.00, "specId": 365908, "totalNum": 1000.00, "whDeptId": 245871},
+    {"availableNum": 10000.00, "quarantineNum": 0.00, "specId": 301814, "totalNum": 1000.00, "whDeptId": 327193},
+    {"availableNum": 22000.00, "quarantineNum": 0.00, "specId": 328428, "totalNum": 2200.00, "whDeptId": 245871},
+    {"availableNum": 30000.00, "quarantineNum": 0.00, "specId": 364936, "totalNum": 3000.00, "whDeptId": 326932},
+    {"availableNum": 20000.00, "quarantineNum": 0.00, "specId": 306240, "totalNum": 2000.00, "whDeptId": 245770},
+    {"availableNum": 30.00, "quarantineNum": 0.00, "specId": 364753, "totalNum": 1000.00, "whDeptId": 245871},
+    {"availableNum": 12000.00, "quarantineNum": 0.00, "specId": 364742, "totalNum": 1200.00, "whDeptId": 245871},
+    {"availableNum": 110.00, "quarantineNum": 0.00, "specId": 364752, "totalNum": 1000.00, "whDeptId": 245971},
+    {"availableNum": 40.00, "quarantineNum": 0.00, "specId": 365908, "totalNum": 1000.00, "whDeptId": 326932},
+    {"availableNum": 600.00, "quarantineNum": 0.00, "specId": 364742, "totalNum": 600.00, "whDeptId": 245971},
+    {"availableNum": 20.00, "quarantineNum": 0.00, "specId": 364753, "totalNum": 1000.00, "whDeptId": 245971},
+    {"availableNum": 21000.00, "quarantineNum": 0.00, "specId": 328428, "totalNum": 2100.00, "whDeptId": 245971}
 ]

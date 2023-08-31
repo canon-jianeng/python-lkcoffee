@@ -10,9 +10,7 @@ def get_national_flag(goods_id):
     # 获取货物规格和供应商id
     spec_dict = order_strategy.get_spec_supplier(goods_id, wh_range)
     print(spec_dict, '\n')
-    '''
-    场景1: 全国PO, 存在多个不同货物规格对应不同的供应商
-    '''
+    # 场景1: 全国PO, 存在多个不同货物规格对应不同的供应商
     # 判断是否全国PO
     for spec_supplier in spec_dict.keys():
         spec_val = spec_supplier.split('_')
@@ -22,9 +20,7 @@ def get_national_flag(goods_id):
         # 相同计划完成日期的仓库
         date_wh_dict = get_plan_date(goods_id, wh_data)
         for plan_date in date_wh_dict:
-            '''
-            场景2: 存在同一个仓库，对应同一个货物的多个规格的数据
-            '''
+            # 场景2: 存在同一个仓库，对应同一个货物的多个规格的数据
             wh_list = date_wh_dict[plan_date]
             # 获取货物的全部规格id
             spec_wh_list = order_strategy.get_spec_list(goods_id, spec_id, wh_list)
@@ -107,7 +103,6 @@ def get_plan_date(goods_id, wh_list):
         for scene_val in scene_dict:
             plan_finish_date_list = scene_dict[scene_val]
             min_date = min(plan_finish_date_list)
-            print(min_date)
             if min_date in date_wh_dict.keys():
                 date_wh_dict[min_date].append(wh_id)
             else:
@@ -173,12 +168,12 @@ def cul_po_new(goods_id, wh_id, scene, date_list, po_new_param):
     pt = po_new_param[3]
     mt = po_new_param[4]
 
+    print('场景{}:'.format(scene), date_list)
     print('wh_bp: {}, shop_bp_ro: {}, 调整后BP-PO: {}, coa: {}, lt: {}, pt: {}, mt: {}'.format(
         wh_bp, shop_bp_ro, bp_po_adj, coa, lt, pt, mt)
     )
 
     # 计划上市日期
-    print('场景{}:'.format(scene), date_list)
     left_plan_date, right_plan_date = order_strategy.new_scene_date(scene, date_list)
 
     if central_type == 1:

@@ -10,50 +10,60 @@ def get_national_flag(goods_id):
     # 获取货物规格和供应商id
     spec_dict = order_strategy.get_spec_supplier(goods_id, wh_range)
     print(spec_dict, '\n')
-    '''
-    场景1: 全国PO, 存在多个不同货物规格对应不同的供应商
-    '''
+    # 场景1: 全国PO, 存在多个不同货物规格对应不同的供应商
     # 判断是否全国PO
     for spec_supplier in spec_dict.keys():
         spec_val = spec_supplier.split('_')
         spec_id = spec_val[0]
         supplier_id = spec_val[1]
-        wh_list = spec_dict[spec_supplier]
-        '''
-        场景2: 存在同一个仓库，对应同一个货物的多个规格的数据
-        '''
-        # 获取货物的全部规格id
-        spec_wh_list = order_strategy.get_spec_list(goods_id, spec_id, wh_list)
-        print('货物规格:', spec_wh_list)
-        # 当前库存(货物纬度)
-        current_stock = order_strategy.cul_current_stock(spec_wh_list)
-        # 在途数量(货物纬度)
-        transit_cg = order_strategy.cul_transit_amount(2, spec_wh_list)
-        print('在途CG总数量:', transit_cg)
-        transit_fh = order_strategy.cul_transit_amount(3, spec_wh_list)
-        print('在途FH总数量:', transit_fh)
-        transit_trs = order_strategy.cul_transit_amount(4, spec_wh_list)
-        print('在途调拨总数量:', transit_trs)
-        transit_delivery = order_strategy.cul_transit_amount(5, spec_wh_list)
-        print('在途配货总数量:', transit_delivery)
-        transit_amount = transit_cg + transit_fh + transit_trs + transit_delivery
-        # 查询用料单位换算采购单位
-        purchase_ratio = order_strategy.get_spec_ratio(spec_id)
-        print('用料单位换算采购单位', purchase_ratio)
-        # 查询报价单
-        price_data = order_strategy.get_price_order(spec_id, supplier_id)
-        if price_data != () and price_data is not None:
-            price_new = price_data[0]
-            # 报价城市为全国(-1), 且"是否全国同一价"为"是"
-            if str(price_new[0]) == '-1' and str(price_new[1]) == '1':
-                print(
-                    '全国PO为"是"', '规格id:{}'.format(spec_id), '供应商id:{}'.format(supplier_id),
-                    '仓库列表:{}'.format(wh_list), '\n'
-                )
-                transit_po = order_strategy.cul_transit_amount(1, [[spec_id, wh_list]], 1)
-                transit_pp = order_strategy.cul_transit_amount(0, [[spec_id, wh_list]], 1)
-                transit_list = [transit_amount, transit_po, transit_pp]
-                cul_sub_new_purchase_amount(goods_id, current_stock, transit_list, purchase_ratio, wh_list, 2)
+        wh_data = spec_dict[spec_supplier]
+        # 相同计划完成日期的仓库
+        date_wh_dict = get_plan_date(goods_id, wh_data)
+        for plan_date in date_wh_dict:
+            # 场景2: 存在同一个仓库，对应同一个货物的多个规格的数据
+            wh_list = date_wh_dict[plan_date]
+            # 获取货物的全部规格id
+            spec_wh_list = order_strategy.get_spec_list(goods_id, spec_id, wh_list)
+            print('货物规格:', spec_wh_list)
+            # 当前库存(货物纬度)
+            current_stock = order_strategy.cul_current_stock(spec_wh_list)
+            # 在途数量(货物纬度)
+            transit_cg = order_strategy.cul_transit_amount(2, spec_wh_list)
+            print('在途CG总数量:', transit_cg)
+            transit_fh = order_strategy.cul_transit_amount(3, spec_wh_list)
+            print('在途FH总数量:', transit_fh)
+            transit_trs = order_strategy.cul_transit_amount(4, spec_wh_list)
+            print('在途调拨总数量:', transit_trs)
+            transit_delivery = order_strategy.cul_transit_amount(5, spec_wh_list)
+            print('在途配货总数量:', transit_delivery)
+            transit_amount = transit_cg + transit_fh + transit_trs + transit_delivery
+            # 查询用料单位换算采购单位
+            purchase_ratio = order_strategy.get_spec_ratio(spec_id)
+            print('用料单位换算采购单位', purchase_ratio)
+            print('计划完成日期:', plan_date)
+            # 查询报价单
+            price_data = order_strategy.get_price_order(spec_id, supplier_id)
+            if price_data != () and price_data is not None:
+                price_new = price_data[0]
+                # 报价城市为全国(-1), 且"是否全国同一价"为"是"
+                if str(price_new[0]) == '-1' and str(price_new[1]) == '1':
+                    print(
+                        '全国PO为"是"', '规格id:{}'.format(spec_id), '供应商id:{}'.format(supplier_id),
+                        '仓库列表:{}'.format(wh_list), '\n'
+                    )
+                    transit_po = order_strategy.cul_transit_amount(1, [[spec_id, wh_list]], 1)
+                    transit_pp = order_strategy.cul_transit_amount(0, [[spec_id, wh_list]], 1)
+                    transit_list = [transit_amount, transit_po, transit_pp]
+                    cul_sub_new_purchase_amount(goods_id, current_stock, transit_list, purchase_ratio, wh_list)
+                else:
+                    print(
+                        '全国PO为"否"', '规格id:{}'.format(spec_id), '供应商id:{}'.format(supplier_id),
+                        '仓库列表:{}'.format(wh_list), '\n'
+                    )
+                    transit_po = order_strategy.cul_transit_amount(1, [[spec_id, wh_list]], 0)
+                    transit_pp = order_strategy.cul_transit_amount(0, [[spec_id, wh_list]], 0)
+                    transit_list = [transit_amount, transit_po, transit_pp]
+                    cul_sub_new_purchase_amount(goods_id, current_stock, transit_list, purchase_ratio, wh_list)
             else:
                 print(
                     '全国PO为"否"', '规格id:{}'.format(spec_id), '供应商id:{}'.format(supplier_id),
@@ -62,22 +72,13 @@ def get_national_flag(goods_id):
                 transit_po = order_strategy.cul_transit_amount(1, [[spec_id, wh_list]], 0)
                 transit_pp = order_strategy.cul_transit_amount(0, [[spec_id, wh_list]], 0)
                 transit_list = [transit_amount, transit_po, transit_pp]
-                cul_sub_new_purchase_amount(goods_id, current_stock, transit_list, purchase_ratio, wh_list, 2)
-        else:
-            print(
-                '全国PO为"否"', '规格id:{}'.format(spec_id), '供应商id:{}'.format(supplier_id),
-                '仓库列表:{}'.format(wh_list), '\n'
-            )
-            transit_po = order_strategy.cul_transit_amount(1, [[spec_id, wh_list]], 0)
-            transit_pp = order_strategy.cul_transit_amount(0, [[spec_id, wh_list]], 0)
-            transit_list = [transit_amount, transit_po, transit_pp]
-            cul_sub_new_purchase_amount(goods_id, current_stock, transit_list, purchase_ratio, wh_list, 2)
+                cul_sub_new_purchase_amount(goods_id, current_stock, transit_list, purchase_ratio, wh_list)
 
 
-def cul_sub_new_purchase_amount(goods_id, current_stock, transit_list, purchase_ratio, wh_list, new_flag):
+def cul_sub_new_purchase_amount(goods_id, current_stock, transit_list, purchase_ratio, wh_list):
     sub_new_num_total = 0
     for wh_id in wh_list:
-        sub_new_num = cul_goods_scene(goods_id, wh_id, new_flag)
+        sub_new_num = cul_po_sub_new(goods_id, wh_id)
         sub_new_num_total += sub_new_num
     # 次新品补单量 = 消耗量 - 当前库存 - 在途配货 - 在途CG/FH - 在途调拨 - 在途PP1 - 在途PO1
     sub_new_num_total = max(sub_new_num_total - current_stock - transit_list[0], 0)
@@ -85,28 +86,39 @@ def cul_sub_new_purchase_amount(goods_id, current_stock, transit_list, purchase_
     print('次新品补采-次新品补单量:', sub_new_num_total / purchase_ratio, '\n')
 
 
-def cul_goods_scene(goods_id, wh_id, new_flag):
-    scene_dict = order_strategy.get_new_scene(goods_id, wh_id, new_flag)
-    new_consume_list = 0
-    for scene_val in scene_dict:
-        plan_finish_date_list = scene_dict[scene_val]
-        if scene_val in ['1', '2', '3', '4', '5']:
-            # 次新品备货参数取全国数据
-            po_new_param = order_strategy.get_po_sub_new_param(goods_id, 0)
-            # 次新品备货参数取仓库数据
-            po_new_wh_param = order_strategy.get_po_sub_new_wh_param(goods_id, wh_id, 0)
-            consume_num = cul_po_sub_new(
-                goods_id, wh_id, scene_val,
-                po_new_param + po_new_wh_param
-            )
-            new_consume_list += consume_num
-        else:
-            new_consume_list += 0
-    return new_consume_list
-
-
-def cul_po_sub_new(goods_id, wh_id, scene, po_sub_new_param):
+def get_plan_date(goods_id, wh_list):
     now_date = lk_tools.datetool.get_now_date()
+    # 次新品备货参数取全国数据
+    po_new_param = order_strategy.get_po_sub_new_param(goods_id, 0)
+    bp_po_adj = po_new_param[2]
+    vlt = po_new_param[0]
+    date_wh_dict = {}
+    for wh_id in wh_list:
+        scene_dict = order_strategy.get_new_scene(goods_id, wh_id, 2)
+        for scene_val in scene_dict:
+            plan_finish_date_list = scene_dict[scene_val]
+            if scene_val == '5':
+                # 计划完成日期 = min(当前日+调整后BP-PO+调整后VLT, min("计划上市日期")-15天)
+                left_date = lk_tools.datetool.cul_date(now_date, bp_po_adj + vlt)
+                right_date = lk_tools.datetool.cul_date(min(plan_finish_date_list), -15)
+                plan_finish_date = min(left_date, right_date)
+            else:
+                # 计划完成日期 = 当前日 + 调整后BP-PO + 调整后VLT
+                plan_finish_date = lk_tools.datetool.cul_date(now_date, bp_po_adj + vlt)
+            if plan_finish_date in date_wh_dict.keys():
+                date_wh_dict[plan_finish_date].append(wh_id)
+            else:
+                date_wh_dict[plan_finish_date] = [wh_id]
+    return date_wh_dict
+
+
+def cul_po_sub_new(goods_id, wh_id):
+    now_date = lk_tools.datetool.get_now_date()
+    # 次新品备货参数取全国数据
+    po_new_param = order_strategy.get_po_sub_new_param(goods_id, 0)
+    # 次新品备货参数取仓库数据
+    po_new_wh_param = order_strategy.get_po_sub_new_wh_param(goods_id, wh_id, 0)
+    po_sub_new_param = po_new_param + po_new_wh_param
     # 判断货物大类是否轻食
     large_class_flag = order_strategy.is_food_type(goods_id)
     # 判断是否是中心仓
@@ -127,14 +139,6 @@ def cul_po_sub_new(goods_id, wh_id, scene, po_sub_new_param):
     print('调整后BP-PO: {}, vlt: {}, ss: {}, 调整后WT: {}'.format(
         bp_po_adj, vlt, ss, wt_adj)
     )
-
-    # 计划上市日期
-    if scene == '1' or scene == '2' or scene == '3' or scene == '4':
-        # 计划完成日期 = 当前日 + 调整后BP-PO + 调整后VLT
-        plan_finish_date = ''
-    elif scene == '5':
-        # 计划完成日期 = min(当前日+调整后BP-PO+调整后VLT, min("计划上市日期")-15天)
-        plan_finish_date = ''
 
     if central_type == 1:
         # [当前日, 当前日+(调整后BP-PO+调整后VLT+调整后SS)]周期

@@ -147,9 +147,7 @@ def new_scene_date(scene, plan_finish_date_list):
     # 新品场景
     date_list = []
     min_date = min(plan_finish_date_list)
-    print(min_date)
     max_date = max(plan_finish_date_list)
-    print(max_date)
     # 场景1: 同个货物只有一个上市计划
     if scene == '1':
         left_date = min_date
@@ -170,7 +168,6 @@ def new_scene_date(scene, plan_finish_date_list):
         left_date = min_date
         right_date = min_date
         date_list = [left_date, right_date]
-    print(date_list)
     return date_list
 
 
@@ -222,6 +219,7 @@ def get_cg_fh_trs(spec_wh_list, transit_type):
         for spec_wh in spec_wh_list:
             spec_id = str(transit_val['specId'])
             if spec_id == str(spec_wh[0]) and str(transit_val['whDeptId']) == str(spec_wh[1]):
+                # 过滤重复数据
                 if spec_wh not in data_list:
                     data_list.append(spec_wh)
                     print('在途CG(type=2)数量: {}'.format(transit_val['ztNum']),
@@ -278,12 +276,16 @@ def cul_current_stock(spec_wh_list: list):
     # 日志关键词:【智慧订单】获取实时库存
     # 数仓取值: 当前库存
     stock_total = 0
+    data_list = []
     for data_dict in stock_list:
         for spec_wh in spec_wh_list:
             if str(data_dict['specId']) == str(spec_wh[0]) and str(data_dict['whDeptId']) == str(spec_wh[1]):
-                print('当前库存(获取实时库存): {}'.format(data_dict['totalNum']),
-                      '规格id: {}'.format(spec_wh[0]), '仓库id: {}'.format(spec_wh[1]))
-                stock_total += data_dict['totalNum']
+                # 过滤重复数据
+                if spec_wh not in data_list:
+                    data_list.append(spec_wh)
+                    print('当前库存(获取实时库存): {}'.format(data_dict['totalNum']),
+                          '规格id: {}'.format(spec_wh[0]), '仓库id: {}'.format(spec_wh[1]))
+                    stock_total += data_dict['totalNum']
     return stock_total
 
 
