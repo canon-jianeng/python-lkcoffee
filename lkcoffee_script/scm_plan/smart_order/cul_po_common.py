@@ -71,14 +71,14 @@ def cul_end_order_day(goods_id, increment_num):
 
 
 def get_national_flag(goods_id):
-    # 仓库：全国所有“已完善”，且非“已停业”的城市仓
+    # 仓库：全国所有"已完善"，且非"已停业"的城市仓
     wh_list = order_strategy.get_wh_list()
     wh_range = str(wh_list).replace('[', '(').replace(']', ')')
     # 获取货物规格和供应商id
     spec_dict = order_strategy.get_spec_supplier(goods_id, wh_range)
     print(spec_dict, '\n')
     '''
-    场景1: 全国PO, 存在多个不同货物规格对应不同的供应商
+    场景1: 多个不同货物规格和不同的供应商 对应 多个全国PO
     例: 
       1.规格: xcy咖啡豆1箱2000克(id: 301814), 对应供应商: SC004990
       2.规格: xcy咖啡豆1000g(id: 306240), 对应供应商: SC202917
@@ -90,9 +90,8 @@ def get_national_flag(goods_id):
         supplier_id = spec_val[1]
         wh_list = spec_dict[spec_supplier]
         '''
-        场景2: 存在同一个仓库，对应同一个货物的多个规格的数据
+        场景2: 一个仓库下的货物规格id和可替换货物规格【满足同一个货物】
         '''
-        # 获取货物的全部规格id
         spec_wh_list = order_strategy.get_spec_list(goods_id, spec_id, wh_list)
         print('货物规格和仓库:', spec_wh_list)
         # 当前库存(货物纬度)

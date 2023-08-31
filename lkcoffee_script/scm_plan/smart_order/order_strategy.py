@@ -456,7 +456,7 @@ def get_wh_list():
 
 
 def get_spec_list(goods_id, spec_id, wh_list):
-    # 获取货物的规格id【可替换规格】和仓库
+    # 获取【货物的规格id和可替换规格】和【仓库】
     spec_wh_list = []
     for wh_id in wh_list:
         cursor.execute(sql_spec_version.format(spec_id, wh_id))

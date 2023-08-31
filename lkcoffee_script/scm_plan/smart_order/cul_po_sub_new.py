@@ -4,25 +4,25 @@ import order_strategy
 
 
 def get_national_flag(goods_id):
-    # 仓库：全国所有“已完善”，且非“已停业”的城市仓
+    # 仓库：全国所有"已完善"，且非"已停业"的城市仓
     wh_list = order_strategy.get_wh_list()
     wh_range = str(wh_list).replace('[', '(').replace(']', ')')
     # 获取货物规格和供应商id
     spec_dict = order_strategy.get_spec_supplier(goods_id, wh_range)
     print(spec_dict, '\n')
-    # 场景1: 全国PO, 存在多个不同货物规格对应不同的供应商
     # 判断是否全国PO
     for spec_supplier in spec_dict.keys():
         spec_val = spec_supplier.split('_')
         spec_id = spec_val[0]
         supplier_id = spec_val[1]
+        # 多个不同货物规格和不同的供应商 对应 多个全国PO
+        # 相同货物规格和供应商id的仓库
         wh_data = spec_dict[spec_supplier]
         # 相同计划完成日期的仓库
         date_wh_dict = get_plan_date(goods_id, wh_data)
         for plan_date in date_wh_dict:
-            # 场景2: 存在同一个仓库，对应同一个货物的多个规格的数据
             wh_list = date_wh_dict[plan_date]
-            # 获取货物的全部规格id
+            # 获取一个仓库下的货物规格id和可替换货物规格【满足同一个货物】
             spec_wh_list = order_strategy.get_spec_list(goods_id, spec_id, wh_list)
             print('货物规格:', spec_wh_list)
             # 当前库存(货物纬度)
