@@ -243,4 +243,12 @@ if __name__ == '__main__':
     cul_end_order_day(48214, increment_num=1)
     cul_end_order_day(48214, increment_num=2)
     # xcy咖啡豆
+    # 供应商: 小奶狗  SC004990  1964
+    # 供应商: 北京赢识  SC202917  629992
+    '''
+    货物规格id  供应商id  仓库id
+    364742     1964:    [327193]
+    301814     1964:    [245971, 245871]
+    306240     629992:  [326932, 245770]
+    '''
     get_national_flag(48214)

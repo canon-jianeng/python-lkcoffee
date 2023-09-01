@@ -107,6 +107,7 @@ def get_plan_date(goods_id, wh_list):
                 date_wh_dict[min_date].append(wh_id)
             else:
                 date_wh_dict[min_date] = [wh_id]
+    print(date_wh_dict)
     return date_wh_dict
 
 
@@ -125,6 +126,7 @@ def cul_goods_scene(goods_id, wh_id, new_flag):
                 plan_finish_date_list,
                 po_new_param + po_new_wh_param
             )
+            print(consume_list)
             new_consume_list = list(map(lambda x, y: x + y, new_consume_list, consume_list))
         else:
             new_consume_list = list(map(lambda x, y: x + y, new_consume_list, [0, 0, 0]))
@@ -144,16 +146,19 @@ def cul_plan_finish_date(min_date):
 
 
 def cul_po_new(goods_id, wh_id, scene, date_list, po_new_param):
-    # 判断货物大类是否轻食
+    # 判断货物大类是否食品
     large_class_flag = order_strategy.is_food_type(goods_id)
+    print('货物大类是否食品:', large_class_flag)
     # 判断是否是中心仓
     is_cdc, is_cdc_model = order_strategy.get_central_wh(goods_id, wh_id)
     if is_cdc == 1 and is_cdc_model == 0:
         # 非中心仓
         central_type = 0
+        print('非中心仓', is_cdc, is_cdc_model)
     else:
         # 中心仓
         central_type = 1
+        print('中心仓', is_cdc, is_cdc_model)
 
     # 门店BP+RO
     shop_bp_ro = po_new_param[5]
@@ -174,7 +179,7 @@ def cul_po_new(goods_id, wh_id, scene, date_list, po_new_param):
     )
 
     # 计划上市日期
-    left_plan_date, right_plan_date = order_strategy.new_scene_date(scene, date_list)
+    left_plan_date, right_plan_date = order_strategy.new_scene_date(scene, date_list, large_class_flag, central_type)
 
     if central_type == 1:
         # 中心仓
@@ -272,5 +277,14 @@ def cul_po_new(goods_id, wh_id, scene, date_list, po_new_param):
 
 
 if __name__ == '__main__':
-    # JK纯牛奶(仓配\盘点)
+    # JK纯牛奶(仓配\盘点) 货物id: 83625
+    # 货物大类: 轻食 货物大类id: 70, 127
+    # 供应商: 小奶狗  SC004990  1964
+    # 供应商: 北京赢识  SC202917  629992
+    '''
+    货物规格id  供应商id  仓库id
+    364752     1964:    [327193]
+    364753     1964:    [245971, 245871]
+    365908     629992:  [326932, 245770]
+    '''
     get_national_flag(83625)

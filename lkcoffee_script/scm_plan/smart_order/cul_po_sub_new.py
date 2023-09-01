@@ -109,6 +109,7 @@ def get_plan_date(goods_id, wh_list):
                 date_wh_dict[plan_finish_date].append(wh_id)
             else:
                 date_wh_dict[plan_finish_date] = [wh_id]
+    print(date_wh_dict)
     return date_wh_dict
 
 
@@ -119,7 +120,7 @@ def cul_po_sub_new(goods_id, wh_id):
     # 次新品备货参数取仓库数据
     po_new_wh_param = order_strategy.get_po_sub_new_wh_param(goods_id, wh_id, 0)
     po_sub_new_param = po_new_param + po_new_wh_param
-    # 判断货物大类是否轻食
+    # 判断货物大类是否食品
     large_class_flag = order_strategy.is_food_type(goods_id)
     # 判断是否是中心仓
     is_cdc, is_cdc_model = order_strategy.get_central_wh(goods_id, wh_id)
@@ -165,5 +166,14 @@ def cul_po_sub_new(goods_id, wh_id):
 
 
 if __name__ == '__main__':
-    # JK咖啡豆（仓配\计算）
+    # JK咖啡豆（仓配\计算） 货物id: 83626
+    # 货物大类: JK原料 货物大类id: 202
+    # 供应商: 小奶狗  SC004990  1964
+    # 供应商: 北京赢识  SC202917  629992
+    '''
+    货物规格id  供应商id  仓库id
+    364754     1964:    [327193]
+    364755     1964:    [245971, 245871]
+    3284866     629992:  [326932, 245770]
+    '''
     get_national_flag(83626)

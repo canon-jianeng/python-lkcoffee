@@ -89,13 +89,14 @@ def is_food_type(goods_id):
     large_class_id = cursor.fetchall()[0][0]
     # 配置中心【新品、次新品CG货物是食品的大类ID】: luckycooperation.orderstrategy.config
     # 判断 "商品大类" 是否为"食品"
-    if large_class_id in [171, 224]:
+    if large_class_id in [4, 6, 171, 814, 187, 135, 743, 712, 224, 729, 748, 729]:
         return True
     else:
         return False
 
 
 def get_new_scene(goods_id, wh_id, new_flag):
+    # 同一个仓库和同一个货物只有一个场景
     # 新品场景和计划完成日期
     scene_date = {}
     cursor.execute(
@@ -143,7 +144,7 @@ def get_po_sub_new_wh_param(goods_id, wh_id, goods_type):
     return list(po_sub_new_tuple)
 
 
-def new_scene_date(scene, plan_finish_date_list):
+def new_scene_date(scene, plan_finish_date_list, large_class_flag, central_type):
     # 新品场景
     date_list = []
     min_date = min(plan_finish_date_list)
@@ -160,7 +161,8 @@ def new_scene_date(scene, plan_finish_date_list):
         date_list = [left_date, right_date]
     # 场景3: 同个货物有多个上市计划，且"计划上市日期"不同，且min("计划上市日期")和max("计划上市日期")的间隔 ≤ 11天（冷启动周期重合）
     elif scene == '3':
-        left_date = min_date
+        # 扣减 min_date, 不扣减 max_date
+        left_date = max_date
         right_date = max_date
         date_list = [left_date, right_date]
     # 场景4: 同个货物有多个上市计划，且"计划上市日期"不同，且min("计划上市日期")和max("计划上市日期")的间隔 ＞ 11天（冷启动周期不重合）
