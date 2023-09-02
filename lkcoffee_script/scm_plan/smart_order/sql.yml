@@ -76,8 +76,12 @@ sql:
       WHERE goods_id={} AND wh_dept_id in {};"
     query_vlt:
       "SELECT po_vlt FROM t_bi_goods_spec_city_config WHERE goods_id={}"
-    query_spec_wh:
+    query_spec_supplier:
       "SELECT goods_spec_id, supplier_id, wh_dept_id
+      FROM t_bi_goods_spec_city_config
+      WHERE city_purchase_status=1 AND goods_id={} AND wh_dept_id in {}"
+    query_spec_wh:
+      "SELECT goods_spec_id, wh_dept_id
       FROM t_bi_goods_spec_city_config
       WHERE city_purchase_status=1 AND goods_id={} AND wh_dept_id in {}"
     query_spec_version:
@@ -89,7 +93,7 @@ sql:
       FROM t_bi_goods_spec_city_config
       WHERE version='{}'"
     query_spec:
-      "SELECT id FROM t_stock_goods_spec WHERE goods_id={}"
+      "SELECT id FROM t_stock_goods_spec WHERE goods_id={} AND info_status=1 AND `status`=1 AND deleted=0"
     query_shop_consume:
       "SELECT IFNULL(SUM(pred_shop_consume), 0) 
       FROM t_alg_new_demand_plan 

@@ -51,7 +51,7 @@ sql_pred_v0 = mysql_sql['cooperation']['query_pred_v0']
 sql_pred_amount = mysql_sql['cooperation']['query_pred_amount']
 sql_day_consume = mysql_sql['cooperation']['query_day_consume']
 sql_vlt = mysql_sql['cooperation']['query_vlt']
-sql_spec_wh = mysql_sql['cooperation']['query_spec_wh']
+sql_spec_supplier = mysql_sql['cooperation']['query_spec_supplier']
 sql_spec_version = mysql_sql['cooperation']['query_spec_version']
 sql_spec_replace = mysql_sql['cooperation']['query_spec_replace']
 sql_spec = mysql_sql['cooperation']['query_spec']
@@ -75,10 +75,10 @@ def get_central_wh(goods_id, wh_id):
     data_json = json.loads(config_data)
     is_cdc, is_cdc_model = 0, 0
     for data_val in data_json:
-        if data_val['cdc_wh_dept_id'] == float(wh_id) and data_val['goods_id'] == float(goods_id):
+        if (str(data_val['wh_dept_id']).split('.')[0] == str(wh_id)
+                and str(data_val['goods_id']).split('.')[0] == str(goods_id)):
             is_cdc = data_val['is_cdc']
             is_cdc_model = data_val['is_cdc_model']
-            print(is_cdc, is_cdc_model)
     return int(is_cdc), int(is_cdc_model)
 
 
@@ -142,58 +142,6 @@ def get_po_sub_new_wh_param(goods_id, wh_id, goods_type):
     )
     po_sub_new_tuple = cursor.fetchall()[0]
     return list(po_sub_new_tuple)
-
-
-def new_scene_date(scene, plan_finish_date_list, large_class_flag, central_type):
-    # 新品场景
-    date_list = []
-    min_date = min(plan_finish_date_list)
-    max_date = max(plan_finish_date_list)
-    # 场景1: 同个货物只有一个上市计划
-    if scene == '1':
-        left_date = min_date
-        right_date = min_date
-        date_list = [left_date, right_date]
-    # 场景2: 同个货物有多个上市计划，且"计划上市日期"相同
-    elif scene == '2':
-        left_date = min_date
-        right_date = min_date
-        date_list = [left_date, right_date]
-    # 场景3: 同个货物有多个上市计划，且"计划上市日期"不同，且min("计划上市日期")和max("计划上市日期")的间隔 ≤ 11天（冷启动周期重合）
-    elif scene == '3':
-        # 扣减 min_date, 不扣减 max_date
-        left_date = max_date
-        right_date = max_date
-        date_list = [left_date, right_date]
-    # 场景4: 同个货物有多个上市计划，且"计划上市日期"不同，且min("计划上市日期")和max("计划上市日期")的间隔 ＞ 11天（冷启动周期不重合）
-    elif scene == '4':
-        left_date = min_date
-        right_date = min_date
-        date_list = [left_date, right_date]
-    return date_list
-
-
-def sub_new_scene_date(scene, plan_finish_date_list):
-    # 次新品的场景
-    min_date = min(plan_finish_date_list)
-    # 场景1: 同个货物只有一个上市计划
-    if scene == '1':
-        plan_date = min_date
-    # 场景2: 同个货物有多个上市计划，且"计划上市日期"相同
-    elif scene == '2':
-        plan_date = min_date
-    # 场景3: 同个货物有多个上市计划，且"计划上市日期"不同，且min("计划上市日期")和max("计划上市日期")的间隔 ≤ 11天（冷启动周期重合）
-    elif scene == '3':
-        plan_date = min_date
-    # 场景4: 同个货物有多个上市计划，且"计划上市日期"不同，且min("计划上市日期")和max("计划上市日期")的间隔 ＞ 11天（冷启动周期不重合）
-    elif scene == '4':
-        plan_date = min_date
-    # 场景5: 同个货物有多个上市计划，且"计划上市日期"不同，且包含新品和次新品
-    elif scene == '5':
-        plan_date = min_date
-    else:
-        plan_date = min_date
-    return plan_date
 
 
 def cul_shop_consume(goods_id, wh_id, start_date, end_date):
@@ -457,6 +405,16 @@ def get_wh_list():
     return wh_list
 
 
+def get_goods_spec_list(goods_id):
+    # 货物规格：货物下所有"已完善"，且未删除的货物规格
+    spec_list = []
+    cursor.execute(sql_spec.format(goods_id))
+    spec_data = cursor.fetchall()
+    for val in spec_data:
+        spec_list.append(val[0])
+    return spec_list
+
+
 def get_spec_list(goods_id, spec_id, wh_list):
     # 获取【货物的规格id和可替换规格】和【仓库】
     spec_wh_list = []
@@ -480,7 +438,7 @@ def get_spec_list(goods_id, spec_id, wh_list):
 def get_spec_supplier(goods_id, wh_range):
     # 获取货物规格和供应商id
     spec_dict = {}
-    cursor.execute(sql_spec_wh.format(goods_id, wh_range))
+    cursor.execute(sql_spec_supplier.format(goods_id, wh_range))
     spec_data = cursor.fetchall()
     for data_val in spec_data:
         spec_supplier = str(data_val[0]) + '_' + str(data_val[1])
@@ -511,4 +469,4 @@ def get_price_order(spec_id, supplier_id):
 
 
 if __name__ == '__main__':
-    get_central_wh(20617, 4001)
+    get_central_wh(83625, 327193)
