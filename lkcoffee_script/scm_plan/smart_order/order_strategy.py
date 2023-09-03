@@ -470,3 +470,4 @@ def get_price_order(spec_id, supplier_id):
 
 if __name__ == '__main__':
     get_central_wh(83625, 327193)
+    is_food_type(83625)
