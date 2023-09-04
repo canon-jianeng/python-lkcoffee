@@ -2,9 +2,10 @@
 import json
 import yaml
 import pymysql
+from lkcoffee_script import lk_tools
 from current_stock import stock_list
 from transit_data import transit_data
-from lkcoffee_script import lk_tools
+from theory_shop_stock import theory_shop_stock_list
 
 
 with open('./sql.yml', encoding='utf-8') as f:
@@ -87,9 +88,10 @@ def is_food_type(goods_id):
         sql_large_class_id.format(goods_id)
     )
     large_class_id = cursor.fetchall()[0][0]
-    # 配置中心【新品、次新品CG货物是食品的大类ID】: luckycooperation.orderstrategy.config
+    # 配置中心【新品、次新品CG货物是食品的大类ID】: luckycooperation.special.config
+    # 修改这个字段: foodsRelateGoodsLargeClass
     # 判断 "商品大类" 是否为"食品"
-    if large_class_id in [4, 6, 171, 814, 187, 135, 743, 712, 224, 729, 748, 729]:
+    if large_class_id in [3, 36]:
         return True
     else:
         return False
@@ -162,64 +164,92 @@ def cul_wh_out_num(goods_id, wh_id, start_date, end_date):
     return wh_consume
 
 
-def get_cg_fh_trs(spec_wh_list, transit_type):
+def get_cg_fh_trs(spec_wh_list, transit_type, plan_finish_date):
+    plan_date = lk_tools.datetool.str_to_date(plan_finish_date)
     transit_amount = 0
-    data_list = []
-    for transit_val in transit_data[transit_type]:
-        for spec_wh in spec_wh_list:
-            spec_id = str(transit_val['specId'])
-            if spec_id == str(spec_wh[0]) and str(transit_val['whDeptId']) == str(spec_wh[1]):
-                # 过滤重复数据
-                if spec_wh not in data_list:
-                    data_list.append(spec_wh)
-                    print('在途CG(type=2)数量: {}'.format(transit_val['ztNum']),
-                          '规格id: {}'.format(spec_wh[0]), '仓库id: {}'.format(spec_wh[1]))
-                    transit_amount += transit_val['ztNum']
+    type_data = transit_data[transit_type]
+    for date_val in type_data:
+        end_date = lk_tools.datetool.str_to_date(date_val)
+        if end_date <= plan_date:
+            data_list = []
+            for transit_val in type_data[date_val]:
+                for spec_wh in spec_wh_list:
+                    spec_id = str(transit_val['specId'])
+                    if spec_id == str(spec_wh[0]) and str(transit_val['whDeptId']) == str(spec_wh[1]):
+                        # 过滤重复数据
+                        if spec_wh not in data_list:
+                            data_list.append(spec_wh)
+                            print('在途数量: {}'.format(transit_val['ztNum']),
+                                  '规格id: {}'.format(spec_wh[0]), '仓库id: {}'.format(spec_wh[1]))
+                            transit_amount += transit_val['ztNum']
     return transit_amount
 
 
-def get_po_pp(spec_wh_list, transit_type, national_flag):
+def get_po_pp(spec_wh_list, transit_type, plan_finish_date, national_flag):
+    plan_date = lk_tools.datetool.str_to_date(plan_finish_date)
     transit_amount = 0
     if national_flag == 1:
         wh_val = '-1'
     else:
-        wh_val = str(spec_wh_list[0][1])
-    for transit_dict in transit_data[transit_type]:
-        spec_id = str(transit_dict['specId'])
-        if spec_id == str(spec_wh_list[0][0]) and str(transit_dict['whDeptId']) == wh_val:
-            print('在途PP(type=0)数量: {}'.format(transit_dict['ztNum']),
-                  '规格id: {}'.format(spec_id), '仓库id: {}'.format(transit_dict['whDeptId']))
-            transit_amount = transit_dict['ztNum']
+        wh_val = str(spec_wh_list[0][1][0])
+    type_data = transit_data[transit_type]
+    for date_val in type_data:
+        end_date = lk_tools.datetool.str_to_date(date_val)
+        if end_date <= plan_date:
+            for transit_val in type_data[date_val]:
+                spec_id = str(transit_val['specId'])
+                if spec_id == str(spec_wh_list[0][0]) and str(transit_val['whDeptId']) == wh_val:
+                    print('在途数量: {}'.format(transit_val['ztNum']),
+                          '规格id: {}'.format(spec_id), '仓库id: {}'.format(transit_val['whDeptId']))
+                    transit_amount = transit_val['ztNum']
     return transit_amount
 
 
-def cul_transit_amount(type_val: int, spec_wh_list: list, national_flag=0):
+def cul_transit_amount(type_val: int, spec_wh_list: list, plan_finish_date, national_flag=0):
     # 日志关键词:【智慧订单】获取汇总在途成功、仓库汇总在途1、仓库汇总在途2
     # 数仓取值: 在途CG、在途FH、在途调拨(货物纬度), 全国取各仓库总和
     # 数仓取值: 在途PO、在途PP(规格纬度), 全国取'-1'
     transit_amount = 0
     if type_val == 0:
         # 在途PP(type=0)
-        transit_amount = get_po_pp(spec_wh_list, 'type_0', national_flag)
+        transit_amount = get_po_pp(spec_wh_list, 'type_0', plan_finish_date, national_flag)
     elif type_val == 1:
         # 在途PO(type=1)
-        transit_amount = get_po_pp(spec_wh_list, 'type_1', national_flag)
+        transit_amount = get_po_pp(spec_wh_list, 'type_1', plan_finish_date, national_flag)
     elif type_val == 2:
         # 在途CG(type=2)
-        transit_amount = get_cg_fh_trs(spec_wh_list, 'type_2')
+        transit_amount = get_cg_fh_trs(spec_wh_list, 'type_2', plan_finish_date)
     elif type_val == 3:
         # 在途FH(type=3)
-        transit_amount = get_cg_fh_trs(spec_wh_list, 'type_3')
+        transit_amount = get_cg_fh_trs(spec_wh_list, 'type_3', plan_finish_date)
     elif type_val == 4:
         # 在途调拨(type=4)
-        transit_amount = get_cg_fh_trs(spec_wh_list, 'type_4')
+        transit_amount = get_cg_fh_trs(spec_wh_list, 'type_4', plan_finish_date)
     elif type_val == 5:
         # 在途配货(type=5)
-        transit_amount = get_cg_fh_trs(spec_wh_list, 'type_5')
+        transit_amount = get_cg_fh_trs(spec_wh_list, 'type_5', plan_finish_date)
     elif type_val == 6:
         # 在途cc(type=6)
-        transit_amount = get_cg_fh_trs(spec_wh_list, 'type_6')
+        transit_amount = get_cg_fh_trs(spec_wh_list, 'type_6', plan_finish_date)
     return transit_amount
+
+
+def cul_theory_shop_stock(goods_id, wh_list: list):
+    # 日志关键词:【智慧订单】获取实时门店货物的理论可用库存成功
+    # 数仓取值: 门店货物的理论可用库存
+    stock_total = 0
+    data_list = []
+    for data_dict in theory_shop_stock_list:
+        for wh_id in wh_list:
+            if str(data_dict['goodsId']) == str(goods_id) and str(data_dict['whDeptId']) == str(wh_id):
+                goods_wh = [str(goods_id), str(wh_id)]
+                # 过滤重复数据
+                if goods_wh not in data_list:
+                    data_list.append(goods_wh)
+                    print('门店货物的理论可用库存: {}'.format(data_dict['theoryStockNum']),
+                          '货物id: {}'.format(goods_id), '仓库id: {}'.format(wh_id))
+                    stock_total += data_dict['theoryStockNum']
+    return stock_total
 
 
 def cul_current_stock(spec_wh_list: list):

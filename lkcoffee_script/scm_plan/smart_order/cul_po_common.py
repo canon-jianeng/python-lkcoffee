@@ -68,6 +68,7 @@ def cul_end_order_day(goods_id, increment_num):
     # PO最晚下单日 = 计划完成日期 - po_vlt
     end_order_date = finish_plan_date - datetime.timedelta(days=po_vlt)
     print("PO{}最晚下单日".format(increment_num), end_order_date, '\n')
+    return date_list[1]
 
 
 def get_national_flag(goods_id):
@@ -89,24 +90,6 @@ def get_national_flag(goods_id):
         spec_id = spec_val[0]
         supplier_id = spec_val[1]
         wh_list = spec_dict[spec_supplier]
-        '''
-        场景2: 一个仓库下的货物规格id和可替换货物规格【满足同一个货物】
-        '''
-        spec_wh_list = order_strategy.get_spec_list(goods_id, spec_id, wh_list)
-        print('货物规格和仓库:', spec_wh_list)
-        # 当前库存(货物纬度)
-        current_stock = order_strategy.cul_current_stock(spec_wh_list)
-        # 在途数量(货物纬度)
-        transit_cg = order_strategy.cul_transit_amount(2, spec_wh_list)
-        print('在途CG总数量:', transit_cg)
-        transit_fh = order_strategy.cul_transit_amount(3, spec_wh_list)
-        print('在途FH总数量:', transit_fh)
-        transit_trs = order_strategy.cul_transit_amount(4, spec_wh_list)
-        print('在途调拨总数量:', transit_trs)
-        transit_amount = transit_cg + transit_fh + transit_trs
-        # 查询用料单位换算采购单位
-        purchase_ratio = order_strategy.get_spec_ratio(spec_id)
-        print('用料单位换算采购单位', purchase_ratio)
         # 查询报价单
         price_data = order_strategy.get_price_order(spec_id, supplier_id)
         if price_data != () and price_data is not None:
@@ -117,41 +100,32 @@ def get_national_flag(goods_id):
                     '全国PO为"是"', '规格id:{}'.format(spec_id), '供应商id:{}'.format(supplier_id),
                     '仓库列表:{}'.format(wh_list), '\n'
                 )
-                transit_po = order_strategy.cul_transit_amount(1, [[spec_id, wh_list]], 1)
-                transit_pp = order_strategy.cul_transit_amount(0, [[spec_id, wh_list]], 1)
-                transit_list = [transit_amount, transit_po, transit_pp]
-                cul_purchase_amount(goods_id, current_stock, transit_list, purchase_ratio, wh_list)
+                cul_purchase_amount(goods_id, spec_id, wh_list)
             else:
                 print(
                     '全国PO为"否"', '规格id:{}'.format(spec_id), '供应商id:{}'.format(supplier_id),
                     '仓库列表:{}'.format(wh_list), '\n'
                 )
-                transit_po = order_strategy.cul_transit_amount(1, [[spec_id, wh_list]], 0)
-                transit_pp = order_strategy.cul_transit_amount(0, [[spec_id, wh_list]], 0)
-                transit_list = [transit_amount, transit_po, transit_pp]
-                cul_purchase_amount(goods_id, current_stock, transit_list, purchase_ratio, wh_list)
+                cul_purchase_amount(goods_id, spec_id, wh_list)
         else:
             print(
                 '全国PO为"否"', '规格id:{}'.format(spec_id), '供应商id:{}'.format(supplier_id),
                 '仓库列表:{}'.format(wh_list), '\n'
             )
-            transit_po = order_strategy.cul_transit_amount(1, [[spec_id, wh_list]], 0)
-            transit_pp = order_strategy.cul_transit_amount(0, [[spec_id, wh_list]], 0)
-            transit_list = [transit_amount, transit_po, transit_pp]
-            cul_purchase_amount(goods_id, current_stock, transit_list, purchase_ratio, wh_list)
+            cul_purchase_amount(goods_id, spec_id, wh_list)
 
 
-def cul_purchase_amount(goods_id, current_stock, transit_list,
-                        purchase_ratio, wh_list, increment_num=2):
+def cul_purchase_amount(goods_id, spec_id, wh_list, increment_num=2):
     """
     :param goods_id: 货物id
-    :param current_stock: 货物当前库存
-    :param transit_list: 在途库存
-    :param purchase_ratio: 用料采购单位换算
+    :param spec_id: 货物规格id
     :param wh_list: 仓库列表
     :param increment_num: T+n月, n为1或者2
     :return
     """
+    # 查询用料单位换算采购单位
+    purchase_ratio = order_strategy.get_spec_ratio(spec_id)
+    print('用料单位换算采购单位', purchase_ratio)
     wh_range = str(wh_list).replace('[', '(').replace(']', ')')
 
     if increment_num == 1:
@@ -167,6 +141,28 @@ def cul_purchase_amount(goods_id, current_stock, transit_list,
         print('T-2周日均消耗(采购单位)', round(day_consume[1] / purchase_ratio, 5))
         print('T-3周日均消耗(采购单位)', round(day_consume[2] / purchase_ratio, 5))
         print('T-4周日均消耗(采购单位)', round(day_consume[3] / purchase_ratio, 5), '\n')
+
+    plan_date = cul_end_order_day(goods_id, increment_num)
+
+    '''
+    场景2: 一个仓库下的货物规格id和可替换货物规格【满足同一个货物】
+    '''
+    spec_wh_list = order_strategy.get_spec_list(goods_id, spec_id, wh_list)
+    print('货物规格和仓库:', spec_wh_list)
+    # 当前库存(货物纬度)
+    current_stock = order_strategy.cul_current_stock(spec_wh_list)
+    # 在途数量(货物纬度)
+    transit_cg = order_strategy.cul_transit_amount(2, spec_wh_list, plan_date)
+    print('在途CG总数量:', transit_cg)
+    transit_fh = order_strategy.cul_transit_amount(3, spec_wh_list, plan_date)
+    print('在途FH总数量:', transit_fh)
+    transit_trs = order_strategy.cul_transit_amount(4, spec_wh_list, plan_date)
+    print('在途调拨总数量:', transit_trs)
+    transit_amount = transit_cg + transit_fh + transit_trs
+
+    transit_po = order_strategy.cul_transit_amount(1, [[spec_id, wh_list]], plan_date, 1)
+    transit_pp = order_strategy.cul_transit_amount(0, [[spec_id, wh_list]], plan_date, 1)
+    transit_list = [transit_amount, transit_po, transit_pp]
 
     # 获取T日, T+1月最后一天或者T+2月最后一天
     date_list = get_date_range(increment_num)
@@ -193,8 +189,7 @@ def cul_purchase_amount(goods_id, current_stock, transit_list,
     elif increment_num == 2:
         # 计算+1采购量
         purchase_amount1 = cul_purchase_amount(
-            goods_id, current_stock, transit_list,
-            purchase_ratio, wh_list,
+            goods_id, spec_id, wh_list,
             increment_num=1
         )
         # +1采购量为负数, 则取0
@@ -239,9 +234,9 @@ def cul_purchase_amount(goods_id, current_stock, transit_list,
 
 
 if __name__ == '__main__':
-    # 玫瑰味糖浆
-    cul_end_order_day(48214, increment_num=1)
-    cul_end_order_day(48214, increment_num=2)
+    # # 玫瑰味糖浆
+    # cul_end_order_day(48214, increment_num=1)
+    # cul_end_order_day(48214, increment_num=2)
     # xcy咖啡豆
     # 供应商: 小奶狗  SC004990  1964
     # 供应商: 北京赢识  SC202917  629992

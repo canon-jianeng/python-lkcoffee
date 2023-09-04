@@ -3,6 +3,28 @@ from lkcoffee_script import lk_tools
 import order_strategy
 
 
+'''
+场景数据:
+wh_dept_id  goods_id   scene_type   mark_type   commodity_plan_launch_dates
+327193	    83625	    5	        2	        2023-09-01,2023-09-20,2023-09-30   包含过去日期和未来日期(大于今天)
+245971	    83625	    1           2	        2023-09-01                         只有今天和过去日期
+245871	    83625	    2	        2	        2023-09-02                         只有今天和过去日期
+326932	    83625	    3	        2	        2023-08-20,2023-08-30              只有今天和过去日期
+245770	    83625	    4	        2	        2023-08-01,2023-08-30              只有今天和过去日期
+'''
+
+
+def get_future_date(plan_finish_date_list):
+    now_val = lk_tools.datetool.get_now_date()
+    future_date_list = []
+    now_date = lk_tools.datetool.str_to_date(now_val)
+    for date_val in plan_finish_date_list:
+        date_data = lk_tools.datetool.str_to_date(date_val)
+        if date_data > now_date:
+            future_date_list.append(date_val)
+    return future_date_list
+
+
 def get_national_flag(goods_id):
     # 仓库：全国所有"已完善"，且非"已停业"的城市仓
     wh_list = order_strategy.get_wh_list()
@@ -25,16 +47,19 @@ def get_national_flag(goods_id):
             # 获取一个仓库下的货物规格id和可替换货物规格【满足同一个货物】
             spec_wh_list = order_strategy.get_spec_list(goods_id, spec_id, wh_list)
             print('货物规格:', spec_wh_list)
+            # 门店货物理论可用库存
+            theory_shop_stock = order_strategy.cul_theory_shop_stock(goods_id, wh_list)
             # 当前库存(货物纬度)
             current_stock = order_strategy.cul_current_stock(spec_wh_list)
+            current_stock += theory_shop_stock
             # 在途数量(货物纬度)
-            transit_cg = order_strategy.cul_transit_amount(2, spec_wh_list)
+            transit_cg = order_strategy.cul_transit_amount(2, spec_wh_list, plan_date)
             print('在途CG总数量:', transit_cg)
-            transit_fh = order_strategy.cul_transit_amount(3, spec_wh_list)
+            transit_fh = order_strategy.cul_transit_amount(3, spec_wh_list, plan_date)
             print('在途FH总数量:', transit_fh)
-            transit_trs = order_strategy.cul_transit_amount(4, spec_wh_list)
+            transit_trs = order_strategy.cul_transit_amount(4, spec_wh_list, plan_date)
             print('在途调拨总数量:', transit_trs)
-            transit_delivery = order_strategy.cul_transit_amount(5, spec_wh_list)
+            transit_delivery = order_strategy.cul_transit_amount(5, spec_wh_list, plan_date)
             print('在途配货总数量:', transit_delivery)
             transit_amount = transit_cg + transit_fh + transit_trs + transit_delivery
             # 查询用料单位换算采购单位
@@ -51,8 +76,10 @@ def get_national_flag(goods_id):
                         '全国PO为"是"', '规格id:{}'.format(spec_id), '供应商id:{}'.format(supplier_id),
                         '仓库列表:{}'.format(wh_list), '\n'
                     )
-                    transit_po = order_strategy.cul_transit_amount(1, [[spec_id, wh_list]], 1)
-                    transit_pp = order_strategy.cul_transit_amount(0, [[spec_id, wh_list]], 1)
+                    transit_po = order_strategy.cul_transit_amount(1, [[spec_id, wh_list]], plan_date, 1)
+                    print('在途po总数量:', transit_po)
+                    transit_pp = order_strategy.cul_transit_amount(0, [[spec_id, wh_list]], plan_date, 1)
+                    print('在途pp总数量:', transit_pp)
                     transit_list = [transit_amount, transit_po, transit_pp]
                     cul_sub_new_purchase_amount(goods_id, current_stock, transit_list, purchase_ratio, wh_list)
                 else:
@@ -60,8 +87,10 @@ def get_national_flag(goods_id):
                         '全国PO为"否"', '规格id:{}'.format(spec_id), '供应商id:{}'.format(supplier_id),
                         '仓库列表:{}'.format(wh_list), '\n'
                     )
-                    transit_po = order_strategy.cul_transit_amount(1, [[spec_id, wh_list]], 0)
-                    transit_pp = order_strategy.cul_transit_amount(0, [[spec_id, wh_list]], 0)
+                    transit_po = order_strategy.cul_transit_amount(1, [[spec_id, wh_list]], plan_date, 0)
+                    print('在途po总数量:', transit_po)
+                    transit_pp = order_strategy.cul_transit_amount(0, [[spec_id, wh_list]], plan_date, 0)
+                    print('在途pp总数量:', transit_pp)
                     transit_list = [transit_amount, transit_po, transit_pp]
                     cul_sub_new_purchase_amount(goods_id, current_stock, transit_list, purchase_ratio, wh_list)
             else:
@@ -69,8 +98,10 @@ def get_national_flag(goods_id):
                     '全国PO为"否"', '规格id:{}'.format(spec_id), '供应商id:{}'.format(supplier_id),
                     '仓库列表:{}'.format(wh_list), '\n'
                 )
-                transit_po = order_strategy.cul_transit_amount(1, [[spec_id, wh_list]], 0)
-                transit_pp = order_strategy.cul_transit_amount(0, [[spec_id, wh_list]], 0)
+                transit_po = order_strategy.cul_transit_amount(1, [[spec_id, wh_list]], plan_date, 0)
+                print('在途po总数量:', transit_po)
+                transit_pp = order_strategy.cul_transit_amount(0, [[spec_id, wh_list]], plan_date, 0)
+                print('在途pp总数量:', transit_pp)
                 transit_list = [transit_amount, transit_po, transit_pp]
                 cul_sub_new_purchase_amount(goods_id, current_stock, transit_list, purchase_ratio, wh_list)
 
@@ -83,7 +114,8 @@ def cul_sub_new_purchase_amount(goods_id, current_stock, transit_list, purchase_
     # 次新品补单量 = 消耗量 - 当前库存 - 在途配货 - 在途CG/FH - 在途调拨 - 在途PP1 - 在途PO1
     sub_new_num_total = max(sub_new_num_total - current_stock - transit_list[0], 0)
     sub_new_num_total = max(sub_new_num_total - transit_list[1] - transit_list[2], 0)
-    print('次新品补采-次新品补单量:', sub_new_num_total / purchase_ratio, '\n')
+    print('次新品补采-次新品补单量:', sub_new_num_total)
+    print('次新品补采-次新品补单量(采购单位):', sub_new_num_total / purchase_ratio, '\n')
 
 
 def get_plan_date(goods_id, wh_list):
@@ -98,11 +130,14 @@ def get_plan_date(goods_id, wh_list):
         for scene_val in scene_dict:
             plan_finish_date_list = scene_dict[scene_val]
             if scene_val == '5':
-                # 计划完成日期 = min(当前日+调整后BP-PO+调整后VLT, min("计划上市日期")-15天)
+                # 场景5: 包含过去的日期和未来的日期
+                # 计划完成日期 = min(当前日+调整后BP-PO+调整后VLT, min(未来的"计划上市日期")-15天)
                 left_date = lk_tools.datetool.cul_date(now_date, bp_po_adj + vlt)
-                right_date = lk_tools.datetool.cul_date(min(plan_finish_date_list), -15)
+                future_date_list = get_future_date(plan_finish_date_list)
+                right_date = lk_tools.datetool.cul_date(min(future_date_list), -15)
                 plan_finish_date = min(left_date, right_date)
             else:
+                # 场景1、2、3、4: 只有过去的日期
                 # 计划完成日期 = 当前日 + 调整后BP-PO + 调整后VLT
                 plan_finish_date = lk_tools.datetool.cul_date(now_date, bp_po_adj + vlt)
             if plan_finish_date in date_wh_dict.keys():
@@ -145,6 +180,7 @@ def cul_po_sub_new(goods_id, wh_id):
         # [当前日, 当前日+(调整后BP-PO+调整后VLT+调整后SS)]周期
         start_date = now_date
         end_date = lk_tools.datetool.cul_date(now_date, bp_po_adj + vlt + ss)
+        print(start_date, end_date)
         if food_flag:
             # 次新品补单量 = [当前日, 调整后BP-PO+调整后VLT+调整后SS+调整后WT]周期内【门店消耗】需求量
             sub_new_num = order_strategy.cul_shop_consume(goods_id, wh_id, start_date, end_date)
@@ -155,13 +191,14 @@ def cul_po_sub_new(goods_id, wh_id):
         # [当前日, 当前日+(调整后BP-PO+调整后VLT+调整后SS+调整后WT)]周期
         start_date = now_date
         end_date = lk_tools.datetool.cul_date(now_date, bp_po_adj + vlt + ss + wt_adj)
+        print(start_date, end_date)
         if food_flag:
             # 次新品补单量 = [当前日, 调整后BP-PO+调整后VLT+调整后SS+调整后WT]周期内【门店消耗】需求量
             sub_new_num = order_strategy.cul_shop_consume(goods_id, wh_id, start_date, end_date)
         else:
             # 次新品补单量 = [当前日, 调整后BP-PO+调整后VLT+调整后SS+调整后WT]周期内【仓库出库】需求量
             sub_new_num = order_strategy.cul_wh_out_num(goods_id, wh_id, start_date, end_date)
-    print(sub_new_num)
+    # print('次新品需求量:', sub_new_num)
     return float(sub_new_num)
 
 
@@ -175,4 +212,4 @@ if __name__ == '__main__':
     # JK意式咖啡豆500g（仓配\盘点）  364754     1964:    [327193]
     # JK意式咖啡豆10g（仓配\盘点）   364755     1964:    [245971, 245871]
     # JK猫式咖啡豆1000g（仓配\盘点） 3284866     629992:  [326932, 245770]
-    get_national_flag(83626)
+    get_national_flag(83625)
