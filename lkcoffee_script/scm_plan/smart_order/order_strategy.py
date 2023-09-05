@@ -67,6 +67,9 @@ sql_po_new_wh_param = mysql_sql['cooperation']['query_po_new_wh_param']
 sql_po_sub_new_param = mysql_sql['cooperation']['query_po_sub_new_param']
 sql_po_sub_new_wh_param = mysql_sql['cooperation']['query_po_sub_new_wh_param']
 sql_central_data = mysql_sql['dm']['query_central_data']
+sql_sale_shop_definite = mysql_sql['cooperation']['query_sale_shop_definite']
+sql_sale_shop_v0 = mysql_sql['cooperation']['query_sale_shop_v0']
+sql_sale_shop = mysql_sql['cooperation']['query_sale_shop']
 
 
 def get_central_wh(goods_id, wh_id):
@@ -91,7 +94,7 @@ def is_food_type(goods_id):
     # 配置中心【新品、次新品CG货物是食品的大类ID】: luckycooperation.special.config
     # 修改这个字段: foodsRelateGoodsLargeClass
     # 判断 "商品大类" 是否为"食品"
-    if large_class_id in [3, 36]:
+    if large_class_id in [3, 36, 127]:
         return True
     else:
         return False
@@ -106,7 +109,7 @@ def get_new_scene(goods_id, wh_id, new_flag):
     )
     sql_data = cursor.fetchall()
     for val in sql_data:
-        scene_date[str(val[0])] = val[1].split(',')
+        scene_date[str(val[0])] = [val[1].split(','), val[2].split(',')]
     return scene_date
 
 
@@ -498,6 +501,51 @@ def get_price_order(spec_id, supplier_id):
     return price_data
 
 
+def get_sale_shop_version(year_val):
+    # 判断售卖门店数是否存在确定版
+    cursor.execute(sql_sale_shop_definite.format(year_val))
+    sql_data = cursor.fetchall()
+    if sql_data == ():
+        # 不存在确定版, 获取 v0 版本
+        cursor.execute(sql_sale_shop_v0.format(year_val))
+        sql_data = cursor.fetchall()
+        if sql_data == ():
+            version_id = 0
+        else:
+            version_id = int(sql_data[0][0])
+    else:
+        version_id = int(sql_data[0][0])
+    return version_id
+
+
+def get_sale_shop_num(wh_dept_id, commodity_id, date_list):
+    year_val = date_list[0].split('-')[0]
+    version_id = get_sale_shop_version(year_val)
+    # 获取售卖门店数
+    cursor.execute(sql_sale_shop.format(
+        version_id, wh_dept_id, commodity_id, year_val, date_list[0], date_list[1]
+    ))
+    sale_shop_num = cursor.fetchall()[0][0]
+    return sale_shop_num
+
+
+def get_sale_shop_total(wh_dept_id, commodity_id, date_list):
+    left_year = int(date_list[0].split('-')[0])
+    right_year = int(date_list[1].split('-')[0])
+    if left_year == right_year:
+        sale_shop_num = get_sale_shop_num(wh_dept_id, commodity_id, date_list)
+    else:
+        left_num = get_sale_shop_num(
+            wh_dept_id, commodity_id, [date_list[0], str(left_year) + '-' + '12' + '-' + '31']
+        )
+        right_num = get_sale_shop_num(
+            wh_dept_id, commodity_id, [str(right_year) + '-' + '01' + '-' + '01', date_list[1]]
+        )
+        sale_shop_num = left_num + right_num
+    return sale_shop_num
+
+
 if __name__ == '__main__':
     get_central_wh(83625, 327193)
     is_food_type(83625)
+    print(get_sale_shop_version('2024'))

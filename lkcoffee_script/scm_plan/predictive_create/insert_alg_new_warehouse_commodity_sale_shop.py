@@ -16,11 +16,21 @@ from lkcoffee_script import lk_tools
 
 
 # 预测当前月及未来的3个月
-now_month = datetime.datetime.now().strftime('%Y-%m')
-date_list_pre = lk_tools.datetool.get_future_date(now_month, 3)
+# now_month = datetime.datetime.now().strftime('%Y-%m')
+# date_list_pre = lk_tools.datetool.get_future_date(now_month, 3)
+
+# 当前年份
+now_year = int(datetime.datetime.now().strftime('%Y'))
+# 未来数据
+# 后一年日期
+date_list_next_year = lk_tools.datetool.get_month_date(str(now_year+1)+'-12')
+# 当前年日期（当前年1月1号到前一天日期的日期列表）
+date_list_now = lk_tools.datetool.get_month_date(str(now_year)+'-12')
+date_list_pre = date_list_now + date_list_next_year
+
 
 wh_dept_id = [
-    '327193', '245971', '245871', '326932', '326327', '-1'
+    '327193', '245971', '245871', '326932', '326327', '245770', '-1'
 ]
 
 # 新品

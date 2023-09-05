@@ -9,7 +9,7 @@ wh_dept_id  goods_id   scene_type   mark_type   commodity_plan_launch_dates
 245971	    83625	    1           1	        2023-09-01
 245871	    83625	    2	        1	        2023-09-01
 326932	    83625	    3	        1	        2023-09-20,2023-09-30
-245770	    83625	    4	        1	        2023-09-01,2023-09-30
+245770	    83625	    4	        1	        2023-09-01,2023-09-10,2023-09-30
 '''
 
 
@@ -45,22 +45,28 @@ def get_national_flag(goods_id):
                         '全国PO为"是"', '规格id:{}'.format(spec_id), '供应商id:{}'.format(supplier_id),
                         '仓库列表:{}'.format(wh_list), '\n'
                     )
-                    cul_new_purchase_amount(goods_id, spec_id, purchase_ratio, wh_list, min_plan_date, 1)
+                    cul_new_purchase_amount(
+                        goods_id, spec_id, purchase_ratio, wh_list, min_plan_date, national_flag=1, new_flag=1
+                    )
                 else:
                     print(
                         '全国PO为"否"', '规格id:{}'.format(spec_id), '供应商id:{}'.format(supplier_id),
                         '仓库列表:{}'.format(wh_list), '\n'
                     )
-                    cul_new_purchase_amount(goods_id, spec_id, purchase_ratio, wh_list, min_plan_date, 1)
+                    cul_new_purchase_amount(
+                        goods_id, spec_id, purchase_ratio, wh_list, min_plan_date, national_flag=0, new_flag=1
+                    )
             else:
                 print(
                     '全国PO为"否"', '规格id:{}'.format(spec_id), '供应商id:{}'.format(supplier_id),
                     '仓库列表:{}'.format(wh_list), '\n'
                 )
-                cul_new_purchase_amount(goods_id, spec_id, purchase_ratio, wh_list, min_plan_date, 1)
+                cul_new_purchase_amount(
+                    goods_id, spec_id, purchase_ratio, wh_list, min_plan_date, national_flag=0, new_flag=1
+                )
 
 
-def cul_stock_amount(goods_id, spec_id, wh_list, plan_date):
+def cul_stock_amount(goods_id, spec_id, wh_list, plan_date, national_flag):
     # 一个仓库下的货物规格id和可替换货物规格【满足同一个货物】
     spec_wh_list = order_strategy.get_spec_list(goods_id, spec_id, wh_list)
     print('货物规格:', spec_wh_list)
@@ -73,54 +79,70 @@ def cul_stock_amount(goods_id, spec_id, wh_list, plan_date):
     print('在途FH总数量:', transit_fh)
     transit_trs = order_strategy.cul_transit_amount(4, spec_wh_list, plan_date)
     print('在途调拨总数量:', transit_trs)
-    transit_po = order_strategy.cul_transit_amount(1, [[spec_id, wh_list]], plan_date, 1)
-    transit_pp = order_strategy.cul_transit_amount(0, [[spec_id, wh_list]], plan_date, 1)
+    transit_po = order_strategy.cul_transit_amount(1, [[spec_id, wh_list]], plan_date, national_flag)
+    transit_pp = order_strategy.cul_transit_amount(0, [[spec_id, wh_list]], plan_date, national_flag)
     return current_stock + transit_cg + transit_fh + transit_trs + transit_po + transit_pp
 
 
-def cul_new_purchase_amount(goods_id, spec_id, purchase_ratio, wh_list, min_date, new_flag):
-    first_batch_num = 0
-    stocking_up_num = 0
-    material_pre_num = 0
-    date_range1 = []
-    date_range2 = []
-    date_range3 = []
+def cul_new_purchase_amount(goods_id, spec_id, purchase_ratio, wh_list, min_date, national_flag, new_flag):
+    first_batch_num, stocking_up_num, material_pre_num = 0, 0, 0
+    sale_shop_num1, sale_shop_num2, sale_shop_num3 = 0, 0, 0
     for wh_id in wh_list:
+        # 一个仓库和货物, 只有一个场景
         new_list = cul_goods_scene(goods_id, wh_id, new_flag)
+        print('仓库id:', wh_id)
+        new_range1 = new_list[1][0]
+        new_range2 = new_list[1][1]
+        new_range3 = new_list[1][2]
+        print('新品首采周期', new_range1, '需求量:', new_list[0][0])
+        print('新品备货周期:', new_range2, '需求量:', new_list[0][1])
+        print('新品备料周期:', new_range3, '需求量:', new_list[0][2])
+        if len(new_list[2]) > 0:
+            commodity_id = new_list[2][0]
+            sale_shop_days1 = lk_tools.datetool.cul_days(new_range1[0], new_range1[1]) + 1
+            print(sale_shop_days1)
+            sale_shop_num1 += order_strategy.get_sale_shop_total(wh_id, commodity_id, new_range1) / sale_shop_days1
+            print(order_strategy.get_sale_shop_total(wh_id, commodity_id, new_range1))
+            new_range2 = lk_tools.datetool.get_date_difference_set(new_range1, new_range2)
+            if len(new_range2) > 0:
+                sale_shop_days2 = lk_tools.datetool.cul_days(new_range2[0], new_range2[1]) + 1
+                sale_shop_num2 += order_strategy.get_sale_shop_total(wh_id, commodity_id, new_range2) / sale_shop_days2
+            new_range3 = lk_tools.datetool.get_date_difference_set(new_range2, new_range3)
+            if len(new_range3) > 0:
+                sale_shop_days3 = lk_tools.datetool.cul_days(new_range3[0], new_range3[1]) + 1
+                sale_shop_num3 += order_strategy.get_sale_shop_total(wh_id, commodity_id, new_range3) / sale_shop_days3
         first_batch_num += new_list[0][0]
         stocking_up_num += new_list[0][1]
         material_pre_num += new_list[0][2]
-        date_range1 = new_list[1][0]
-        date_range2 = new_list[1][1]
-        date_range3 = new_list[1][2]
 
+    print('')
     # 首批计划完成日期 = min("计划上市日期") - 15天
     plan_finish_date1 = lk_tools.datetool.cul_date(min_date, -15)
-    stock_amount1 = cul_stock_amount(goods_id, spec_id, wh_list, plan_finish_date1)
+    stock_amount1 = cul_stock_amount(goods_id, spec_id, wh_list, plan_finish_date1, national_flag)
     # 首批到仓量 = 消耗量 - 当前库存 - 在途CG/FH - 在途调拨 - 在途PP1 - 在途PO1
     first_batch_num = max(first_batch_num - stock_amount1, 0)
+    print('新品首采-售卖门店数', sale_shop_num1)
     print('新品首采-计划完成日期:', plan_finish_date1)
-    print('新品首采周期', date_range1)
     print('新品首采-采购量:', first_batch_num)
     print('新品首采-采购量(采购单位):', first_batch_num / purchase_ratio, '\n')
 
     # 备货计划完成日期 = min("计划上市日期") + 7天
     plan_finish_date2 = lk_tools.datetool.cul_date(min_date, 7)
-    stock_amount2 = cul_stock_amount(goods_id, spec_id, wh_list, plan_finish_date2)
+    stock_amount2 = cul_stock_amount(goods_id, spec_id, wh_list, plan_finish_date2, national_flag)
     # 成品备货量 = 消耗量 - 当前库存 - 在途CG/FH - 在途调拨 - 在途PP1 - 在途PO1
     stocking_up_num = max(stocking_up_num - stock_amount2, 0)
+    print('新品备货-售卖门店数:', sale_shop_num2)
     print('新品备货-计划完成日期:', plan_finish_date2)
-    print('新品备货周期:', date_range2)
     print('新品备货-采购量:', stocking_up_num)
     print('新品备货-采购量(采购单位):', stocking_up_num / purchase_ratio, '\n')
 
     # 备料计划完成日期 = min("计划上市日期") + 30天
     plan_finish_date3 = lk_tools.datetool.cul_date(min_date, 30)
-    stock_amount3 = cul_stock_amount(goods_id, spec_id, wh_list, plan_finish_date3)
+    stock_amount3 = cul_stock_amount(goods_id, spec_id, wh_list, plan_finish_date3, national_flag)
     # 原料备货量 = 消耗量 - 当前库存 - 在途CG/FH - 在途调拨 - 在途PP1 - 在途PO1
     material_pre_num = max(material_pre_num - stock_amount3, 0)
+    print('新品备料-售卖门店数:', sale_shop_num3)
     print('新品备料-计划完成日期:', plan_finish_date3)
-    print('新品备料周期:', date_range3)
     print('新品备料-采购量:', material_pre_num)
     print('新品备料-采购量(采购单位):', material_pre_num / purchase_ratio, '\n')
 
@@ -130,7 +152,7 @@ def get_plan_date(goods_id, wh_list):
     for wh_id in wh_list:
         scene_dict = order_strategy.get_new_scene(goods_id, wh_id, 1)
         for scene_val in scene_dict:
-            plan_finish_date_list = scene_dict[scene_val]
+            plan_finish_date_list = scene_dict[scene_val][0]
             min_date = min(plan_finish_date_list)
             if min_date in date_wh_dict.keys():
                 date_wh_dict[min_date].append(wh_id)
@@ -143,9 +165,11 @@ def get_plan_date(goods_id, wh_list):
 def cul_goods_scene(goods_id, wh_id, new_flag):
     scene_dict = order_strategy.get_new_scene(goods_id, wh_id, new_flag)
     new_consume_list = [0, 0, 0]
+    commodity_ids = []
     date_list = []
     for scene_val in scene_dict:
-        plan_finish_date_list = scene_dict[scene_val]
+        plan_finish_date_list = scene_dict[scene_val][0]
+        commodity_ids = scene_dict[scene_val][1]
         # 新品备货参数取全国数据
         po_new_param = order_strategy.get_po_new_param(goods_id, 0)
         # 新品备货参数取仓库数据
@@ -157,7 +181,7 @@ def cul_goods_scene(goods_id, wh_id, new_flag):
         )
         new_consume_list = list(map(lambda x, y: x + y, new_consume_list, po_new_list[0]))
         date_list = po_new_list[1]
-    po_new_data = [new_consume_list, date_list]
+    po_new_data = [new_consume_list, date_list, commodity_ids]
     return po_new_data
 
 

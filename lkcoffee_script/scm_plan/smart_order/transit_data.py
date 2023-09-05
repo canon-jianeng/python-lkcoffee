@@ -2,7 +2,7 @@
 # 在途数据
 transit_data = {
     'type_0': {
-        '2023-09-01': [
+        '2023-08-01': [
             {"specId": 328428, "whDeptId": 327193, "ztNum": 1000}, {"specId": 364936, "whDeptId": 327193, "ztNum": 1100},
             {"specId": 364936, "whDeptId": 245971, "ztNum": 1200}, {"specId": 364936, "whDeptId": 245871, "ztNum": 1300},
             {"specId": 364936, "whDeptId": 326932, "ztNum": 1400}, {"specId": 364936, "whDeptId": 245770, "ztNum": 1600},
@@ -20,14 +20,11 @@ transit_data = {
             {"specId": 306240, "whDeptId": -1, "ztNum": 5100}, {"specId": 328428, "whDeptId": -1, "ztNum": 5300},
             {"specId": 365569, "whDeptId": -1, "ztNum": 5800}, {"specId": 365940, "whDeptId": -1, "ztNum": 5900},
             {"specId": 365941, "whDeptId": -1, "ztNum": 6100}, {"specId": 3284729, "whDeptId": -1, "ztNum": 6200},
-            {"specId": 364754, "whDeptId": 327193, "ztNum": 190}, {"specId": 364755, "whDeptId": -1, "ztNum": 200},
-            {"specId": 3284866, "whDeptId": -1, "ztNum": 210}, {"specId": 364752, "whDeptId": 327193, "ztNum": 220},
-            {"specId": 364753, "whDeptId": -1, "ztNum": 230}, {"specId": 365908, "whDeptId": -1, "ztNum": 240},
-            {"specId": 3286716, "whDeptId": -1, "ztNum": 6300}
+            {"specId": 364754, "whDeptId": 327193, "ztNum": 190}, {"specId": 364752, "whDeptId": 327193, "ztNum": 220}
         ]
     },
     'type_1': {
-        '2023-09-01': [
+        '2023-08-01': [
             {"specId": 328428, "whDeptId": 327193, "ztNum": 1000}, {"specId": 364936, "whDeptId": 327193, "ztNum": 1100},
             {"specId": 364936, "whDeptId": 245971, "ztNum": 1200}, {"specId": 364936, "whDeptId": 245871, "ztNum": 1300},
             {"specId": 364936, "whDeptId": 326932, "ztNum": 1400}, {"specId": 364936, "whDeptId": 245770, "ztNum": 1600},
@@ -45,14 +42,11 @@ transit_data = {
             {"specId": 306240, "whDeptId": -1, "ztNum": 5100}, {"specId": 328428, "whDeptId": -1, "ztNum": 5300},
             {"specId": 365569, "whDeptId": -1, "ztNum": 5800}, {"specId": 365940, "whDeptId": -1, "ztNum": 5900},
             {"specId": 365941, "whDeptId": -1, "ztNum": 6100}, {"specId": 3284729, "whDeptId": -1, "ztNum": 6200},
-            {"specId": 364754, "whDeptId": 327193, "ztNum": 190}, {"specId": 364755, "whDeptId": -1, "ztNum": 200},
-            {"specId": 3284866, "whDeptId": -1, "ztNum": 210}, {"specId": 364752, "whDeptId": 327193, "ztNum": 220},
-            {"specId": 364753, "whDeptId": -1, "ztNum": 230}, {"specId": 365908, "whDeptId": -1, "ztNum": 240},
-            {"specId": 3286716, "whDeptId": -1, "ztNum": 6300}
+            {"specId": 364754, "whDeptId": 327193, "ztNum": 190}, {"specId": 364752, "whDeptId": 327193, "ztNum": 220}
         ]
     },
     'type_2': {
-        '2023-09-01': [
+        '2023-08-01': [
             {"specId": 301814, "whDeptId": 327193, "ztNum": 1000}, {"specId": 301814, "whDeptId": 245971, "ztNum": 1100},
             {"specId": 301814, "whDeptId": 245871, "ztNum": 1200}, {"specId": 301898, "whDeptId": 327193, "ztNum": 1300},
             {"specId": 301898, "whDeptId": 245971, "ztNum": 1400}, {"specId": 301898, "whDeptId": 245871, "ztNum": 1500},
@@ -95,7 +89,7 @@ transit_data = {
         ]
     },
     'type_3': {
-        '2023-09-01': [
+        '2023-08-01': [
             {"specId": 301814, "whDeptId": 327193, "ztNum": 1000}, {"specId": 301814, "whDeptId": 245971, "ztNum": 1100},
             {"specId": 301814, "whDeptId": 245871, "ztNum": 1200}, {"specId": 301898, "whDeptId": 327193, "ztNum": 1300},
             {"specId": 301898, "whDeptId": 245971, "ztNum": 1400}, {"specId": 301898, "whDeptId": 245871, "ztNum": 1500},
@@ -138,7 +132,7 @@ transit_data = {
         ]
     },
     'type_4': {
-        '2023-09-01': [
+        '2023-08-01': [
             {"specId": 301814, "whDeptId": 327193, "ztNum": 1000}, {"specId": 301814, "whDeptId": 245971, "ztNum": 1100},
             {"specId": 301814, "whDeptId": 245871, "ztNum": 1200}, {"specId": 301898, "whDeptId": 327193, "ztNum": 1300},
             {"specId": 301898, "whDeptId": 245971, "ztNum": 1400}, {"specId": 301898, "whDeptId": 245871, "ztNum": 1500},
@@ -181,7 +175,7 @@ transit_data = {
         ]
     },
     'type_5': {
-        '2023-09-01': [
+        '2023-08-01': [
             {"specId": 364752, "whDeptId": 327193, "ztNum": 10}, {"specId": 364753, "whDeptId": 245971, "ztNum": 20},
             {"specId": 364753, "whDeptId": 245871, "ztNum": 30}, {"specId": 365908, "whDeptId": 326932, "ztNum": 40},
             {"specId": 365908, "whDeptId": 245770, "ztNum": 50}, {"specId": 364752, "whDeptId": 245971, "ztNum": 110},
@@ -189,7 +183,7 @@ transit_data = {
         ]
     },
     'type_6': {
-        '2023-09-01': [
+        '2023-08-01': [
             {"specId": 365937, "whDeptId": 326932}, {"specId": 365937, "whDeptId": 245770},
             {"specId": 365908, "whDeptId": 326932}, {"specId": 365908, "whDeptId": 245770}
         ]

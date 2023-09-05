@@ -213,6 +213,19 @@ def date_compare(left_day, right_day, day_val):
         return False
 
 
+def get_date_difference_set(left_list, right_list):
+    # ['2023-09-20', '2024-02-01'] 和 ['2023-09-20', '2024-02-07'] 结果返回: ['2024-02-02', '2024-02-07']
+    left_date = left_list[-1]
+    right_date1 = right_list[0]
+    right_date2 = right_list[1]
+    if left_date > right_date2:
+        right_list = []
+    else:
+        if left_date > right_date1:
+            right_list[0] = cul_date(left_date, 1)
+    return right_list
+
+
 if __name__ == '__main__':
     # print(get_month_date('2022-12', 4))
     print(get_future_date('2023-07', 3))
