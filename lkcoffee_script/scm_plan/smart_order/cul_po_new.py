@@ -99,18 +99,19 @@ def cul_new_purchase_amount(goods_id, spec_id, purchase_ratio, wh_list, min_date
         print('新品备料周期:', new_range3, '需求量:', new_list[0][2])
         if len(new_list[2]) > 0:
             commodity_id = new_list[2][0]
-            sale_shop_days1 = lk_tools.datetool.cul_days(new_range1[0], new_range1[1]) + 1
-            print(sale_shop_days1)
-            sale_shop_num1 += order_strategy.get_sale_shop_total(wh_id, commodity_id, new_range1) / sale_shop_days1
-            print(order_strategy.get_sale_shop_total(wh_id, commodity_id, new_range1))
+            sale_shop_num, sale_shop_days1 = order_strategy.get_sale_shop_total(wh_id, commodity_id, new_range1)
+            sale_shop_num1 += sale_shop_num / sale_shop_days1
+            print(sale_shop_num, sale_shop_days1)
+            # 实际新品备货周期(过滤新品首采周期)
             new_range2 = lk_tools.datetool.get_date_difference_set(new_range1, new_range2)
             if len(new_range2) > 0:
-                sale_shop_days2 = lk_tools.datetool.cul_days(new_range2[0], new_range2[1]) + 1
-                sale_shop_num2 += order_strategy.get_sale_shop_total(wh_id, commodity_id, new_range2) / sale_shop_days2
+                sale_shop_num, sale_shop_days2 = order_strategy.get_sale_shop_total(wh_id, commodity_id, new_range2)
+                sale_shop_num2 += sale_shop_num / sale_shop_days2
+            # 实际新品备料周期(过滤新品备货周期)
             new_range3 = lk_tools.datetool.get_date_difference_set(new_range2, new_range3)
             if len(new_range3) > 0:
-                sale_shop_days3 = lk_tools.datetool.cul_days(new_range3[0], new_range3[1]) + 1
-                sale_shop_num3 += order_strategy.get_sale_shop_total(wh_id, commodity_id, new_range3) / sale_shop_days3
+                sale_shop_num, sale_shop_days3 = order_strategy.get_sale_shop_total(wh_id, commodity_id, new_range3)
+                sale_shop_num3 += sale_shop_num / sale_shop_days3
         first_batch_num += new_list[0][0]
         stocking_up_num += new_list[0][1]
         material_pre_num += new_list[0][2]

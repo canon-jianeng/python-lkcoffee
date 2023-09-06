@@ -69,7 +69,8 @@ sql_po_sub_new_wh_param = mysql_sql['cooperation']['query_po_sub_new_wh_param']
 sql_central_data = mysql_sql['dm']['query_central_data']
 sql_sale_shop_definite = mysql_sql['cooperation']['query_sale_shop_definite']
 sql_sale_shop_v0 = mysql_sql['cooperation']['query_sale_shop_v0']
-sql_sale_shop = mysql_sql['cooperation']['query_sale_shop']
+sql_future_sale_shop = mysql_sql['cooperation']['query_future_sale_shop']
+sql_actual_sale_shop = mysql_sql['cooperation']['query_actual_sale_shop']
 
 
 def get_central_wh(goods_id, wh_id):
@@ -109,6 +110,7 @@ def get_new_scene(goods_id, wh_id, new_flag):
     )
     sql_data = cursor.fetchall()
     for val in sql_data:
+        # {场景值: [计划日期, 商品id]}
         scene_date[str(val[0])] = [val[1].split(','), val[2].split(',')]
     return scene_date
 
@@ -519,33 +521,70 @@ def get_sale_shop_version(year_val):
 
 
 def get_sale_shop_num(wh_dept_id, commodity_id, date_list):
+    # 获取过去和未来的售卖门店数
     year_val = date_list[0].split('-')[0]
     version_id = get_sale_shop_version(year_val)
-    # 获取售卖门店数
-    cursor.execute(sql_sale_shop.format(
-        version_id, wh_dept_id, commodity_id, year_val, date_list[0], date_list[1]
-    ))
-    sale_shop_num = cursor.fetchall()[0][0]
-    return sale_shop_num
+    now_val = lk_tools.datetool.get_now_date()
+    now_date = lk_tools.datetool.str_to_date(now_val)
+    left_date = lk_tools.datetool.str_to_date(date_list[0])
+    right_date = lk_tools.datetool.str_to_date(date_list[1])
+    sale_shop_num, sale_shop_day = 0, 0
+    if left_date < now_date:
+        for day_num in range((now_date - left_date).days):
+            date_val = lk_tools.datetool.cul_date(date_list[0], day_num)
+            # 过去售卖门店数
+            cursor.execute(sql_actual_sale_shop.format(
+                wh_dept_id, commodity_id, year_val, date_val
+            ))
+            sql_data = cursor.fetchall()
+            # 过滤查询不到数据的日期
+            if sql_data != ():
+                sale_shop_num += sql_data[0][0]
+                sale_shop_day += 1
+        for day_num in range((right_date - now_date).days + 1):
+            date_val = lk_tools.datetool.cul_date(now_val, day_num)
+            # 未来售卖门店数
+            cursor.execute(sql_future_sale_shop.format(
+                version_id, wh_dept_id, commodity_id, year_val, date_val
+            ))
+            sql_data = cursor.fetchall()
+            if sql_data != ():
+                sale_shop_num += sql_data[0][0]
+                sale_shop_day += 1
+    else:
+        for day_num in range((right_date - left_date).days + 1):
+            date_val = lk_tools.datetool.cul_date(date_list[0], day_num)
+            # 未来售卖门店数
+            cursor.execute(sql_future_sale_shop.format(
+                version_id, wh_dept_id, commodity_id, year_val, date_val
+            ))
+            sql_data = cursor.fetchall()
+            if sql_data != ():
+                sale_shop_num += sql_data[0][0]
+                sale_shop_day += 1
+    return sale_shop_num, sale_shop_day
 
 
 def get_sale_shop_total(wh_dept_id, commodity_id, date_list):
     left_year = int(date_list[0].split('-')[0])
     right_year = int(date_list[1].split('-')[0])
+    # 日期范围包含不同年份
     if left_year == right_year:
-        sale_shop_num = get_sale_shop_num(wh_dept_id, commodity_id, date_list)
+        sale_shop_num, sale_shop_day = get_sale_shop_num(wh_dept_id, commodity_id, date_list)
     else:
-        left_num = get_sale_shop_num(
+        left_num, left_day = get_sale_shop_num(
             wh_dept_id, commodity_id, [date_list[0], str(left_year) + '-' + '12' + '-' + '31']
         )
-        right_num = get_sale_shop_num(
+        right_num, right_day = get_sale_shop_num(
             wh_dept_id, commodity_id, [str(right_year) + '-' + '01' + '-' + '01', date_list[1]]
         )
         sale_shop_num = left_num + right_num
-    return sale_shop_num
+        sale_shop_day = left_day + right_day
+    return sale_shop_num, sale_shop_day
 
 
 if __name__ == '__main__':
     get_central_wh(83625, 327193)
     is_food_type(83625)
     print(get_sale_shop_version('2024'))
+    get_sale_shop_total(245971, 5990, ['2023-09-01', '2024-01-03'])

@@ -22,21 +22,6 @@ def get_national_flag(goods_id):
         date_wh_dict = get_plan_date(goods_id, wh_data)
         for plan_date in date_wh_dict:
             wh_list = date_wh_dict[plan_date]
-            # 获取一个仓库下的货物规格id和可替换货物规格【满足同一个货物】
-            spec_wh_list = order_strategy.get_spec_list(goods_id, spec_id, wh_list)
-            print('货物规格:', spec_wh_list)
-            # 当前库存(货物纬度)
-            current_stock = order_strategy.cul_current_stock(spec_wh_list)
-            # 在途数量(货物纬度)
-            transit_cg = order_strategy.cul_transit_amount(2, spec_wh_list)
-            print('在途CG总数量:', transit_cg)
-            transit_fh = order_strategy.cul_transit_amount(3, spec_wh_list)
-            print('在途FH总数量:', transit_fh)
-            transit_trs = order_strategy.cul_transit_amount(4, spec_wh_list)
-            print('在途调拨总数量:', transit_trs)
-            transit_delivery = order_strategy.cul_transit_amount(5, spec_wh_list)
-            print('在途配货总数量:', transit_delivery)
-            transit_amount = transit_cg + transit_fh + transit_trs + transit_delivery
             # 查询用料单位换算采购单位
             purchase_ratio = order_strategy.get_spec_ratio(spec_id)
             print('用料单位换算采购单位', purchase_ratio)
@@ -51,38 +36,54 @@ def get_national_flag(goods_id):
                         '全国PO为"是"', '规格id:{}'.format(spec_id), '供应商id:{}'.format(supplier_id),
                         '仓库列表:{}'.format(wh_list), '\n'
                     )
-                    transit_po = order_strategy.cul_transit_amount(1, [[spec_id, wh_list]], 1)
-                    transit_pp = order_strategy.cul_transit_amount(0, [[spec_id, wh_list]], 1)
-                    transit_list = [transit_amount, transit_po, transit_pp]
-                    cul_sub_new_purchase_amount(goods_id, current_stock, transit_list, purchase_ratio, wh_list)
+                    cul_sub_new_purchase_amount(
+                        goods_id, spec_id, purchase_ratio, wh_list, plan_date, national_flag=1
+                    )
                 else:
                     print(
                         '全国PO为"否"', '规格id:{}'.format(spec_id), '供应商id:{}'.format(supplier_id),
                         '仓库列表:{}'.format(wh_list), '\n'
                     )
-                    transit_po = order_strategy.cul_transit_amount(1, [[spec_id, wh_list]], 0)
-                    transit_pp = order_strategy.cul_transit_amount(0, [[spec_id, wh_list]], 0)
-                    transit_list = [transit_amount, transit_po, transit_pp]
-                    cul_sub_new_purchase_amount(goods_id, current_stock, transit_list, purchase_ratio, wh_list)
+                    cul_sub_new_purchase_amount(
+                        goods_id, spec_id, purchase_ratio, wh_list, plan_date, national_flag=0
+                    )
             else:
                 print(
                     '全国PO为"否"', '规格id:{}'.format(spec_id), '供应商id:{}'.format(supplier_id),
                     '仓库列表:{}'.format(wh_list), '\n'
                 )
-                transit_po = order_strategy.cul_transit_amount(1, [[spec_id, wh_list]], 0)
-                transit_pp = order_strategy.cul_transit_amount(0, [[spec_id, wh_list]], 0)
-                transit_list = [transit_amount, transit_po, transit_pp]
-                cul_sub_new_purchase_amount(goods_id, current_stock, transit_list, purchase_ratio, wh_list)
+                cul_sub_new_purchase_amount(
+                    goods_id, spec_id, purchase_ratio, wh_list, plan_date, national_flag=0
+                )
 
 
-def cul_sub_new_purchase_amount(goods_id, current_stock, transit_list, purchase_ratio, wh_list):
+def cul_stock_amount(goods_id, spec_id, wh_list, plan_date, national_flag):
+    # 一个仓库下的货物规格id和可替换货物规格【满足同一个货物】
+    spec_wh_list = order_strategy.get_spec_list(goods_id, spec_id, wh_list)
+    print('货物规格:', spec_wh_list)
+    # 当前库存(货物纬度)
+    current_stock = order_strategy.cul_current_stock(spec_wh_list)
+    # 在途数量(货物纬度)
+    transit_cg = order_strategy.cul_transit_amount(2, spec_wh_list, plan_date)
+    print('在途CG总数量:', transit_cg)
+    transit_fh = order_strategy.cul_transit_amount(3, spec_wh_list, plan_date)
+    print('在途FH总数量:', transit_fh)
+    transit_trs = order_strategy.cul_transit_amount(4, spec_wh_list, plan_date)
+    print('在途调拨总数量:', transit_trs)
+    transit_po = order_strategy.cul_transit_amount(1, [[spec_id, wh_list]], plan_date, national_flag)
+    transit_pp = order_strategy.cul_transit_amount(0, [[spec_id, wh_list]], plan_date, national_flag)
+    return current_stock + transit_cg + transit_fh + transit_trs + transit_po + transit_pp
+
+
+def cul_sub_new_purchase_amount(goods_id, spec_id, purchase_ratio, wh_list, plan_finish_date, national_flag):
     sub_new_num_total = 0
     for wh_id in wh_list:
-        sub_new_num = cul_po_sub_new(goods_id, wh_id)
-        sub_new_num_total += sub_new_num
+        sub_new_list = cul_po_sub_new(goods_id, wh_id)
+        sub_new_num_total += sub_new_list[0][0]
+        date_list = sub_new_list[1]
+    stock_amount = cul_stock_amount(goods_id, spec_id, wh_list, plan_finish_date, national_flag)
     # 次新品补单量 = 消耗量 - 当前库存 - 在途配货 - 在途CG/FH - 在途调拨 - 在途PP1 - 在途PO1
-    sub_new_num_total = max(sub_new_num_total - current_stock - transit_list[0], 0)
-    sub_new_num_total = max(sub_new_num_total - transit_list[1] - transit_list[2], 0)
+    sub_new_num_total = max(sub_new_num_total - stock_amount, 0)
     print('次新品补采-次新品补单量:', sub_new_num_total / purchase_ratio, '\n')
 
 
@@ -96,7 +97,7 @@ def get_plan_date(goods_id, wh_list):
     for wh_id in wh_list:
         scene_dict = order_strategy.get_new_scene(goods_id, wh_id, 2)
         for scene_val in scene_dict:
-            plan_finish_date_list = scene_dict[scene_val]
+            plan_finish_date_list = scene_dict[scene_val][0]
             if scene_val == '5':
                 # 计划完成日期 = min(当前日+调整后BP-PO+调整后VLT, min("计划上市日期")-15天)
                 left_date = lk_tools.datetool.cul_date(now_date, bp_po_adj + vlt)
@@ -111,6 +112,29 @@ def get_plan_date(goods_id, wh_list):
                 date_wh_dict[plan_finish_date] = [wh_id]
     print(date_wh_dict)
     return date_wh_dict
+
+
+def cul_goods_scene(goods_id, wh_id):
+    now_date = lk_tools.datetool.get_now_date()
+    # 次新品备货参数取全国数据
+    po_new_param = order_strategy.get_po_sub_new_param(goods_id, 0)
+    bp_po_adj = po_new_param[2]
+    vlt = po_new_param[0]
+    date_wh_dict = {}
+    scene_dict = order_strategy.get_new_scene(goods_id, wh_id, 2)
+    for scene_val in scene_dict:
+        plan_finish_date_list = scene_dict[scene_val][0]
+        commodity_ids = scene_dict[scene_val][1]
+        if scene_val == '5':
+            # 计划完成日期 = min(当前日+调整后BP-PO+调整后VLT, min("计划上市日期")-15天)
+            left_date = lk_tools.datetool.cul_date(now_date, bp_po_adj + vlt)
+            right_date = lk_tools.datetool.cul_date(min(plan_finish_date_list), -15)
+            plan_finish_date = min(left_date, right_date)
+        else:
+            # 计划完成日期 = 当前日 + 调整后BP-PO + 调整后VLT
+            plan_finish_date = lk_tools.datetool.cul_date(now_date, bp_po_adj + vlt)
+    po_sub_new_data = [new_consume_list, [plan_finish_date], commodity_ids]
+    return po_sub_new_data
 
 
 def cul_po_sub_new(goods_id, wh_id):
@@ -161,8 +185,10 @@ def cul_po_sub_new(goods_id, wh_id):
         else:
             # 次新品补单量 = [当前日, 调整后BP-PO+调整后VLT+调整后SS+调整后WT]周期内【仓库出库】需求量
             sub_new_num = order_strategy.cul_wh_out_num(goods_id, wh_id, start_date, end_date)
-    print(sub_new_num)
-    return float(sub_new_num)
+    po_sub_new_list = [
+        [float(sub_new_num)], [[start_date, end_date]]
+    ]
+    return po_sub_new_list
 
 
 if __name__ == '__main__':

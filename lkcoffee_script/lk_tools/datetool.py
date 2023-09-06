@@ -238,3 +238,4 @@ if __name__ == '__main__':
     print(cul_date('2023-08-18', -1))
     print(get_date_val("2022-07-05"))
     print(date_compare('2023-07-24', '2023-08-13', '2023-08-01'))
+    print(get_now_time())
