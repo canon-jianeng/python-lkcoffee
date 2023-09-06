@@ -2,6 +2,22 @@
 from lkcoffee_script import lk_tools
 import order_strategy
 
+'''
+场景数据:
+wh_dept_id  goods_id   scene_type   mark_type   commodity_plan_launch_dates
+327193	    83625	    5	        1	        2023-08-20,2023-09-23,2023-09-30
+245971	    83625	    1           1	        2023-08-25
+245871	    83625	    2	        1	        2023-08-25
+326932	    83625	    3	        1	        2023-08-20,2023-08-30
+245770	    83625	    4	        1	        2023-08-10,2023-08-30
+
+UPDATE t_bi_new_warehouse_goods_online_scene SET mark_type=2, scene_type=4, commodity_plan_launch_dates='2023-08-10,2023-08-30' WHERE id=21;
+UPDATE t_bi_new_warehouse_goods_online_scene SET mark_type=2, scene_type=1, commodity_plan_launch_dates='2023-08-25' WHERE id=22;
+UPDATE t_bi_new_warehouse_goods_online_scene SET mark_type=2, scene_type=2, commodity_plan_launch_dates='2023-08-25' WHERE id=23;
+UPDATE t_bi_new_warehouse_goods_online_scene SET mark_type=2, scene_type=3, commodity_plan_launch_dates='2023-08-20,2023-08-30' WHERE id=24;
+UPDATE t_bi_new_warehouse_goods_online_scene SET mark_type=2, scene_type=5, commodity_plan_launch_dates='2023-08-20,2023-09-23,2023-09-30' WHERE id=25;
+'''
+
 
 def get_national_flag(goods_id):
     # 仓库：全国所有"已完善"，且非"已停业"的城市仓
@@ -63,6 +79,9 @@ def cul_stock_amount(goods_id, spec_id, wh_list, plan_date, national_flag):
     print('货物规格:', spec_wh_list)
     # 当前库存(货物纬度)
     current_stock = order_strategy.cul_current_stock(spec_wh_list)
+    print('实时库存:', current_stock)
+    theory_stock = order_strategy.cul_theory_shop_stock(goods_id, spec_wh_list)
+    print('门店货物理论可用库存:', theory_stock)
     # 在途数量(货物纬度)
     transit_cg = order_strategy.cul_transit_amount(2, spec_wh_list, plan_date)
     print('在途CG总数量:', transit_cg)
@@ -72,18 +91,29 @@ def cul_stock_amount(goods_id, spec_id, wh_list, plan_date, national_flag):
     print('在途调拨总数量:', transit_trs)
     transit_po = order_strategy.cul_transit_amount(1, [[spec_id, wh_list]], plan_date, national_flag)
     transit_pp = order_strategy.cul_transit_amount(0, [[spec_id, wh_list]], plan_date, national_flag)
-    return current_stock + transit_cg + transit_fh + transit_trs + transit_po + transit_pp
+    return current_stock + theory_stock + transit_cg + transit_fh + transit_trs + transit_po + transit_pp
 
 
 def cul_sub_new_purchase_amount(goods_id, spec_id, purchase_ratio, wh_list, plan_finish_date, national_flag):
-    sub_new_num_total = 0
+    sub_new_total = 0
+    sub_new_sale_shop = 0
+    sub_new_shop_num = 0
     for wh_id in wh_list:
-        sub_new_list = cul_po_sub_new(goods_id, wh_id)
-        sub_new_num_total += sub_new_list[0][0]
-        date_list = sub_new_list[1]
-    stock_amount = cul_stock_amount(goods_id, spec_id, wh_list, plan_finish_date, national_flag)
+        # 一个仓库和货物, 只有一个场景
+        sub_new_list = cul_goods_scene(goods_id, wh_id)
+        sub_new_range = sub_new_list[1][0]
+        print('次新品补采周期:', sub_new_range, '需求量:', sub_new_list[0][0])
+        # 存在商品id
+        if len(sub_new_list[2]) > 0:
+            commodity_id = sub_new_list[2][0]
+            sub_new_sale_shop, sale_shop_days = order_strategy.get_sale_shop_total(wh_id, commodity_id, sub_new_range)
+            print('仓库售卖门店数:', sub_new_sale_shop, sale_shop_days)
+            sub_new_shop_num += sub_new_sale_shop / sale_shop_days
+        sub_new_total += sub_new_list[0][0]
     # 次新品补单量 = 消耗量 - 当前库存 - 在途配货 - 在途CG/FH - 在途调拨 - 在途PP1 - 在途PO1
-    sub_new_num_total = max(sub_new_num_total - stock_amount, 0)
+    stock_amount = cul_stock_amount(goods_id, spec_id, wh_list, plan_finish_date, national_flag)
+    sub_new_num_total = max(sub_new_total - stock_amount, 0)
+    print('次新品补采-售卖门店数:', sub_new_shop_num)
     print('次新品补采-次新品补单量:', sub_new_num_total / purchase_ratio, '\n')
 
 
@@ -115,25 +145,12 @@ def get_plan_date(goods_id, wh_list):
 
 
 def cul_goods_scene(goods_id, wh_id):
-    now_date = lk_tools.datetool.get_now_date()
-    # 次新品备货参数取全国数据
-    po_new_param = order_strategy.get_po_sub_new_param(goods_id, 0)
-    bp_po_adj = po_new_param[2]
-    vlt = po_new_param[0]
-    date_wh_dict = {}
+    sub_new_consume_list, date_list, commodity_ids = [], [], []
     scene_dict = order_strategy.get_new_scene(goods_id, wh_id, 2)
     for scene_val in scene_dict:
-        plan_finish_date_list = scene_dict[scene_val][0]
         commodity_ids = scene_dict[scene_val][1]
-        if scene_val == '5':
-            # 计划完成日期 = min(当前日+调整后BP-PO+调整后VLT, min("计划上市日期")-15天)
-            left_date = lk_tools.datetool.cul_date(now_date, bp_po_adj + vlt)
-            right_date = lk_tools.datetool.cul_date(min(plan_finish_date_list), -15)
-            plan_finish_date = min(left_date, right_date)
-        else:
-            # 计划完成日期 = 当前日 + 调整后BP-PO + 调整后VLT
-            plan_finish_date = lk_tools.datetool.cul_date(now_date, bp_po_adj + vlt)
-    po_sub_new_data = [new_consume_list, [plan_finish_date], commodity_ids]
+        sub_new_consume_list, date_list = cul_po_sub_new(goods_id, wh_id)
+    po_sub_new_data = [sub_new_consume_list, date_list, commodity_ids]
     return po_sub_new_data
 
 
@@ -146,6 +163,7 @@ def cul_po_sub_new(goods_id, wh_id):
     po_sub_new_param = po_new_param + po_new_wh_param
     # 判断货物大类是否食品
     food_flag = order_strategy.is_food_type(goods_id)
+    print('货物大类是否食品:', food_flag)
     # 判断是否是中心仓
     is_cdc, is_cdc_model = order_strategy.get_central_wh(goods_id, wh_id)
     if is_cdc == 0 and is_cdc_model == 1:
@@ -154,6 +172,7 @@ def cul_po_sub_new(goods_id, wh_id):
     else:
         # 中心仓
         central_flag = True
+    print('是否是中心仓:', central_flag)
 
     # 调整后BP-PO
     bp_po_adj = po_sub_new_param[2]
@@ -201,4 +220,6 @@ if __name__ == '__main__':
     # JK意式咖啡豆500g（仓配\盘点）  364754     1964:    [327193]
     # JK意式咖啡豆10g（仓配\盘点）   364755     1964:    [245971, 245871]
     # JK猫式咖啡豆1000g（仓配\盘点） 3284866     629992:  [326932, 245770]
-    get_national_flag(83626)
+
+    # 演示货物: 86969, 83207
+    get_national_flag(86969)

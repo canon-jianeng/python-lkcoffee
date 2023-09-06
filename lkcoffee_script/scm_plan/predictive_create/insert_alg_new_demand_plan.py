@@ -31,7 +31,7 @@ wh_dept_id = [
 ]
 
 # 新品
-goods_list = [83625]
+goods_list = [83207]
 # goods_list = [46, 83625, 83077]
 # goods_list = [83626, 3077, 3080]
 

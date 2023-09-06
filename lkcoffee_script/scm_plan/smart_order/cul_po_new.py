@@ -10,6 +10,12 @@ wh_dept_id  goods_id   scene_type   mark_type   commodity_plan_launch_dates
 245871	    83625	    2	        1	        2023-09-01
 326932	    83625	    3	        1	        2023-09-20,2023-09-30
 245770	    83625	    4	        1	        2023-09-01,2023-09-10,2023-09-30
+
+UPDATE t_bi_new_warehouse_goods_online_scene SET mark_type=1, scene_type=3, commodity_plan_launch_dates='2023-09-30,2023-09-20,2023-09-23' WHERE id=21;
+UPDATE t_bi_new_warehouse_goods_online_scene SET mark_type=1, scene_type=1, commodity_plan_launch_dates='2023-09-01' WHERE id=22;
+UPDATE t_bi_new_warehouse_goods_online_scene SET mark_type=1, scene_type=2, commodity_plan_launch_dates='2023-09-01' WHERE id=23;
+UPDATE t_bi_new_warehouse_goods_online_scene SET mark_type=1, scene_type=3, commodity_plan_launch_dates='2023-09-20,2023-09-30' WHERE id=24;
+UPDATE t_bi_new_warehouse_goods_online_scene SET mark_type=1, scene_type=4, commodity_plan_launch_dates='2023-09-01,2023-09-10,2023-09-30' WHERE id=25;
 '''
 
 
@@ -94,14 +100,15 @@ def cul_new_purchase_amount(goods_id, spec_id, purchase_ratio, wh_list, min_date
         new_range1 = new_list[1][0]
         new_range2 = new_list[1][1]
         new_range3 = new_list[1][2]
-        print('新品首采周期', new_range1, '需求量:', new_list[0][0])
+        print('新品首采周期:', new_range1, '需求量:', new_list[0][0])
         print('新品备货周期:', new_range2, '需求量:', new_list[0][1])
         print('新品备料周期:', new_range3, '需求量:', new_list[0][2])
+        # 存在商品id
         if len(new_list[2]) > 0:
             commodity_id = new_list[2][0]
             sale_shop_num, sale_shop_days1 = order_strategy.get_sale_shop_total(wh_id, commodity_id, new_range1)
             sale_shop_num1 += sale_shop_num / sale_shop_days1
-            print(sale_shop_num, sale_shop_days1)
+            print('仓库售卖门店数:', sale_shop_num, sale_shop_days1)
             # 实际新品备货周期(过滤新品首采周期)
             new_range2 = lk_tools.datetool.get_date_difference_set(new_range1, new_range2)
             if len(new_range2) > 0:

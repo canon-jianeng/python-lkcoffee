@@ -95,7 +95,7 @@ def is_food_type(goods_id):
     # 配置中心【新品、次新品CG货物是食品的大类ID】: luckycooperation.special.config
     # 修改这个字段: foodsRelateGoodsLargeClass
     # 判断 "商品大类" 是否为"食品"
-    if large_class_id in [3, 36, 127]:
+    if large_class_id in [3, 36, 127, 171]:
         return True
     else:
         return False

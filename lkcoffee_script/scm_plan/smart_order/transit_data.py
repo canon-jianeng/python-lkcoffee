@@ -20,7 +20,7 @@ transit_data = {
             {"specId": 306240, "whDeptId": -1, "ztNum": 5100}, {"specId": 328428, "whDeptId": -1, "ztNum": 5300},
             {"specId": 365569, "whDeptId": -1, "ztNum": 5800}, {"specId": 365940, "whDeptId": -1, "ztNum": 5900},
             {"specId": 365941, "whDeptId": -1, "ztNum": 6100}, {"specId": 3284729, "whDeptId": -1, "ztNum": 6200},
-            {"specId": 364754, "whDeptId": 327193, "ztNum": 190}, {"specId": 364752, "whDeptId": 327193, "ztNum": 220}
+            {"specId": 364754, "whDeptId": 327193, "ztNum": 0}, {"specId": 364752, "whDeptId": 327193, "ztNum": 0}
         ]
     },
     'type_1': {
@@ -42,7 +42,7 @@ transit_data = {
             {"specId": 306240, "whDeptId": -1, "ztNum": 5100}, {"specId": 328428, "whDeptId": -1, "ztNum": 5300},
             {"specId": 365569, "whDeptId": -1, "ztNum": 5800}, {"specId": 365940, "whDeptId": -1, "ztNum": 5900},
             {"specId": 365941, "whDeptId": -1, "ztNum": 6100}, {"specId": 3284729, "whDeptId": -1, "ztNum": 6200},
-            {"specId": 364754, "whDeptId": 327193, "ztNum": 190}, {"specId": 364752, "whDeptId": 327193, "ztNum": 220}
+            {"specId": 364754, "whDeptId": 327193, "ztNum": 0}, {"specId": 364752, "whDeptId": 327193, "ztNum": 0}
         ]
     },
     'type_2': {
