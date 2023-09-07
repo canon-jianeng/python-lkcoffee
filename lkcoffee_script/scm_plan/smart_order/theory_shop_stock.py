@@ -29,5 +29,9 @@ theory_shop_stock_list = [
     {"goodsId": 83626, "theoryStockNum": 6480.00, "whDeptId": 245971},
     {"goodsId": 83626, "theoryStockNum": 6480.00, "whDeptId": 245871},
     {"goodsId": 83626, "theoryStockNum": 6480.00, "whDeptId": 326932},
-    {"goodsId": 83626, "theoryStockNum": 6480.00, "whDeptId": 245770}
+    {"goodsId": 83626, "theoryStockNum": 6480.00, "whDeptId": 245770},
+    {"goodsId": 86969, "theoryStockNum": 880.00, "whDeptId": 245971},
+    {"goodsId": 86969, "theoryStockNum": 1760.00, "whDeptId": 245871},
+    {"goodsId": 83207, "theoryStockNum": 880.00, "whDeptId": 245971},
+    {"goodsId": 83207, "theoryStockNum": 1760.00, "whDeptId": 245871}
 ]

@@ -78,6 +78,7 @@ def cul_stock_amount(goods_id, spec_id, wh_list, plan_date, national_flag):
     print('货物规格:', spec_wh_list)
     # 当前库存(货物纬度)
     current_stock = order_strategy.cul_current_stock(spec_wh_list)
+    print('实时库存:', current_stock)
     # 在途数量(货物纬度)
     transit_cg = order_strategy.cul_transit_amount(2, spec_wh_list, plan_date)
     print('在途CG总数量:', transit_cg)
@@ -86,7 +87,9 @@ def cul_stock_amount(goods_id, spec_id, wh_list, plan_date, national_flag):
     transit_trs = order_strategy.cul_transit_amount(4, spec_wh_list, plan_date)
     print('在途调拨总数量:', transit_trs)
     transit_po = order_strategy.cul_transit_amount(1, [[spec_id, wh_list]], plan_date, national_flag)
+    print('在途po总数量:', transit_po)
     transit_pp = order_strategy.cul_transit_amount(0, [[spec_id, wh_list]], plan_date, national_flag)
+    print('在途pp总数量:', transit_pp)
     return current_stock + transit_cg + transit_fh + transit_trs + transit_po + transit_pp
 
 
@@ -115,7 +118,10 @@ def cul_new_purchase_amount(goods_id, spec_id, purchase_ratio, wh_list, min_date
                 sale_shop_num, sale_shop_days2 = order_strategy.get_sale_shop_total(wh_id, commodity_id, new_range2)
                 sale_shop_num2 += sale_shop_num / sale_shop_days2
             # 实际新品备料周期(过滤新品备货周期)
-            new_range3 = lk_tools.datetool.get_date_difference_set(new_range2, new_range3)
+            if len(new_range2) > 0:
+                new_range3 = lk_tools.datetool.get_date_difference_set(new_range2, new_range3)
+            else:
+                new_range3 = lk_tools.datetool.get_date_difference_set(new_range1, new_range3)
             if len(new_range3) > 0:
                 sale_shop_num, sale_shop_days3 = order_strategy.get_sale_shop_total(wh_id, commodity_id, new_range3)
                 sale_shop_num3 += sale_shop_num / sale_shop_days3
@@ -196,17 +202,20 @@ def cul_goods_scene(goods_id, wh_id, new_flag):
 def cul_po_new(goods_id, wh_id, scene, plan_finish_date_list: list, po_new_param):
     # 判断货物大类是否食品
     food_flag = order_strategy.is_food_type(goods_id)
-    print('货物大类是否食品:', food_flag)
+    if food_flag:
+        print('【食品】显示售卖门店数', '货物大类是否食品:', food_flag)
+    else:
+        print('【非食品】不显示售卖门店数', '货物大类是否食品:', food_flag)
     # 判断是否是中心仓
     is_cdc, is_cdc_model = order_strategy.get_central_wh(goods_id, wh_id)
     if is_cdc == 0 and is_cdc_model == 1:
         # 非中心仓(是否中心仓:0, 是否中心仓模式:1)
         central_flag = False
-        print('非中心仓', '是否中心仓:{}'.format(is_cdc), '是否中心仓模式:{}'.format(is_cdc_model))
+        print('【非中心仓】', '是否中心仓:{}'.format(is_cdc), '是否中心仓模式:{}'.format(is_cdc_model))
     else:
         # 中心仓
         central_flag = True
-        print('中心仓', '是否中心仓:{}'.format(is_cdc), '是否中心仓模式:{}'.format(is_cdc_model))
+        print('【中心仓】', '是否中心仓:{}'.format(is_cdc), '是否中心仓模式:{}'.format(is_cdc_model))
 
     # 门店BP+RO
     shop_bp_ro = po_new_param[5]

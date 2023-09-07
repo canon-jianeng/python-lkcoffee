@@ -80,7 +80,7 @@ def cul_stock_amount(goods_id, spec_id, wh_list, plan_date, national_flag):
     # 当前库存(货物纬度)
     current_stock = order_strategy.cul_current_stock(spec_wh_list)
     print('实时库存:', current_stock)
-    theory_stock = order_strategy.cul_theory_shop_stock(goods_id, spec_wh_list)
+    theory_stock = order_strategy.cul_theory_shop_stock(goods_id, wh_list)
     print('门店货物理论可用库存:', theory_stock)
     # 在途数量(货物纬度)
     transit_cg = order_strategy.cul_transit_amount(2, spec_wh_list, plan_date)
@@ -89,9 +89,13 @@ def cul_stock_amount(goods_id, spec_id, wh_list, plan_date, national_flag):
     print('在途FH总数量:', transit_fh)
     transit_trs = order_strategy.cul_transit_amount(4, spec_wh_list, plan_date)
     print('在途调拨总数量:', transit_trs)
+    transit_allocation = order_strategy.cul_transit_amount(4, spec_wh_list, plan_date)
+    print('在途配货总数量:', transit_allocation)
     transit_po = order_strategy.cul_transit_amount(1, [[spec_id, wh_list]], plan_date, national_flag)
+    print('在途po总数量:', transit_po)
     transit_pp = order_strategy.cul_transit_amount(0, [[spec_id, wh_list]], plan_date, national_flag)
-    return current_stock + theory_stock + transit_cg + transit_fh + transit_trs + transit_po + transit_pp
+    print('在途pp总数量:', transit_pp)
+    return current_stock + theory_stock + transit_cg + transit_fh + transit_trs + transit_allocation + transit_po + transit_pp
 
 
 def cul_sub_new_purchase_amount(goods_id, spec_id, purchase_ratio, wh_list, plan_finish_date, national_flag):
@@ -113,8 +117,9 @@ def cul_sub_new_purchase_amount(goods_id, spec_id, purchase_ratio, wh_list, plan
     # 次新品补单量 = 消耗量 - 当前库存 - 在途配货 - 在途CG/FH - 在途调拨 - 在途PP1 - 在途PO1
     stock_amount = cul_stock_amount(goods_id, spec_id, wh_list, plan_finish_date, national_flag)
     sub_new_num_total = max(sub_new_total - stock_amount, 0)
+    print('次新品补采-次新品补单量:', sub_new_num_total)
     print('次新品补采-售卖门店数:', sub_new_shop_num)
-    print('次新品补采-次新品补单量:', sub_new_num_total / purchase_ratio, '\n')
+    print('次新品补采-次新品补单量(采购单位):', sub_new_num_total / purchase_ratio, '\n')
 
 
 def get_plan_date(goods_id, wh_list):
@@ -129,9 +134,11 @@ def get_plan_date(goods_id, wh_list):
         for scene_val in scene_dict:
             plan_finish_date_list = scene_dict[scene_val][0]
             if scene_val == '5':
-                # 计划完成日期 = min(当前日+调整后BP-PO+调整后VLT, min("计划上市日期")-15天)
+                # 计划完成日期 = min(当前日+调整后BP-PO+调整后VLT, min(未来的"计划上市日期")-15天)
                 left_date = lk_tools.datetool.cul_date(now_date, bp_po_adj + vlt)
-                right_date = lk_tools.datetool.cul_date(min(plan_finish_date_list), -15)
+                right_date = lk_tools.datetool.cul_date(
+                    min(lk_tools.datetool.get_future_date_list(plan_finish_date_list)), -15
+                )
                 plan_finish_date = min(left_date, right_date)
             else:
                 # 计划完成日期 = 当前日 + 调整后BP-PO + 调整后VLT
@@ -163,16 +170,20 @@ def cul_po_sub_new(goods_id, wh_id):
     po_sub_new_param = po_new_param + po_new_wh_param
     # 判断货物大类是否食品
     food_flag = order_strategy.is_food_type(goods_id)
-    print('货物大类是否食品:', food_flag)
+    if food_flag:
+        print('【食品】显示售卖门店数', '货物大类是否食品:', food_flag)
+    else:
+        print('【非食品】不显示售卖门店数', '货物大类是否食品:', food_flag)
     # 判断是否是中心仓
     is_cdc, is_cdc_model = order_strategy.get_central_wh(goods_id, wh_id)
     if is_cdc == 0 and is_cdc_model == 1:
         # 非中心仓
         central_flag = False
+        print('【非中心仓】', '是否中心仓:{}'.format(is_cdc), '是否中心仓模式:{}'.format(is_cdc_model))
     else:
         # 中心仓
         central_flag = True
-    print('是否是中心仓:', central_flag)
+        print('【中心仓】', '是否中心仓:{}'.format(is_cdc), '是否中心仓模式:{}'.format(is_cdc_model))
 
     # 调整后BP-PO
     bp_po_adj = po_sub_new_param[2]
@@ -189,10 +200,10 @@ def cul_po_sub_new(goods_id, wh_id):
         start_date = now_date
         end_date = lk_tools.datetool.cul_date(now_date, bp_po_adj + vlt + ss)
         if food_flag:
-            # 次新品补单量 = [当前日, 调整后BP-PO+调整后VLT+调整后SS+调整后WT]周期内【门店消耗】需求量
+            # 次新品补单量 = [当前日, 调整后BP-PO+调整后VLT+调整后SS]周期内【门店消耗】需求量
             sub_new_num = order_strategy.cul_shop_consume(goods_id, wh_id, start_date, end_date)
         else:
-            # 次新品补单量 = [当前日, 调整后BP-PO+调整后VLT+调整后SS+调整后WT]周期内【仓库出库】需求量
+            # 次新品补单量 = [当前日, 调整后BP-PO+调整后VLT+调整后SS]周期内【仓库出库】需求量
             sub_new_num = order_strategy.cul_wh_out_num(goods_id, wh_id, start_date, end_date)
     else:
         # [当前日, 当前日+(调整后BP-PO+调整后VLT+调整后SS+调整后WT)]周期
@@ -222,4 +233,4 @@ if __name__ == '__main__':
     # JK猫式咖啡豆1000g（仓配\盘点） 3284866     629992:  [326932, 245770]
 
     # 演示货物: 86969, 83207
-    get_national_flag(86969)
+    get_national_flag(83625)

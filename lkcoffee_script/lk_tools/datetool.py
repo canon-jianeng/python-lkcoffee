@@ -226,6 +226,16 @@ def get_date_difference_set(left_list, right_list):
     return right_list
 
 
+def get_future_date_list(date_list):
+    # 获取大于今天的日期列表
+    future_list = []
+    now_date = str_to_date(get_now_date())
+    for date_day in date_list:
+        if str_to_date(date_day) >= now_date:
+            future_list.append(date_day)
+    return future_list
+
+
 if __name__ == '__main__':
     # print(get_month_date('2022-12', 4))
     print(get_future_date('2023-07', 3))
