@@ -237,58 +237,58 @@ def cul_po_new(goods_id, wh_id, scene, plan_finish_date_list: list, po_new_param
 
     if central_flag:
         # 中心仓
-        # 首批到仓周期 = 调整后BP-PO + max(coa, lt)
         if food_flag:
             if scene == '1' or scene == '2':
-                # 首批到仓量 = [计划上市日期, 计划上市日期+BP-PO+max(coa, lt)]周期内【门店消耗】
+                # 首批到仓周期 = 调整后BP-PO + max(coa, lt)
+                # 首批到仓量 = [计划上市日期, 计划上市日期+调整后BP-PO+max(coa, lt)]周期内【门店消耗】
                 start_date1 = plan_finish_date_list[0]
                 end_date1 = lk_tools.datetool.cul_date(plan_finish_date_list[0], bp_po_adj + max(coa, lt))
                 shop_consume = order_strategy.cul_shop_consume(goods_id, wh_id, start_date1, end_date1)
                 first_batch_num = max(shop_consume, 0)
 
-                # 成品备货量 = [计划上市日期+首批到仓周期+1天, 计划上市日期+首批到仓周期+pt]周期内【门店消耗】
+                # 成品备货量 = [计划上市日期+调整后BP-PO+max(coa, lt)+1天, 计划上市日期+调整后BP-PO+max(coa, lt)+pt]周期内【门店消耗】
                 start_date2 = lk_tools.datetool.cul_date(plan_finish_date_list[0], bp_po_adj + max(coa, lt) + 1)
                 end_date2 = lk_tools.datetool.cul_date(plan_finish_date_list[0], bp_po_adj + max(coa, lt) + pt)
                 shop_consume = order_strategy.cul_shop_consume(goods_id, wh_id, start_date2, end_date2)
                 stocking_up_num = max(shop_consume, 0)
 
-                # 原料备货量 = [计划上市日期+首批到仓周期+pt+1天, 计划上市日期+首批到仓周期+pt+mt]周期内【门店消耗】
+                # 原料备货量 = [计划上市日期+调整后BP-PO+max(coa, lt)+pt+1天, 计划上市日期+调整后BP-PO+max(coa, lt)+pt+mt]周期内【门店消耗】
                 start_date3 = lk_tools.datetool.cul_date(plan_finish_date_list[0], bp_po_adj + max(coa, lt) + pt + 1)
                 end_date3 = lk_tools.datetool.cul_date(plan_finish_date_list[0], bp_po_adj + max(coa, lt) + pt + mt)
                 shop_consume = order_strategy.cul_shop_consume(goods_id, wh_id, start_date3, end_date3)
                 material_pre_num = max(shop_consume, 0)
             elif scene == '3':
-                # 首批到仓量 = [ min(计划上市日期), max(计划上市日期)+BP-PO+max(COA, LT)] 周期内【门店消耗】
+                # 首批到仓量 = [ min(计划上市日期), max(计划上市日期)+调整后BP-PO+max(COA, LT)] 周期内【门店消耗】
                 start_date1 = min(plan_finish_date_list)
                 end_date1 = lk_tools.datetool.cul_date(max(plan_finish_date_list), bp_po_adj + max(coa, lt))
                 shop_consume = order_strategy.cul_shop_consume(goods_id, wh_id, start_date1, end_date1)
                 first_batch_num = max(shop_consume, 0)
 
-                # 成品备货量 = [ max(计划上市日期)+首批到仓周期+1天, max(计划上市日期)+首批到仓周期+PT] 周期内【门店消耗】
+                # 成品备货量 = [ max(计划上市日期)+调整后BP-PO+max(COA, LT)+1天, max(计划上市日期)+调整后BP-PO+max(COA, LT)+PT] 周期内【门店消耗】
                 start_date2 = lk_tools.datetool.cul_date(max(plan_finish_date_list), bp_po_adj + max(coa, lt) + 1)
                 end_date2 = lk_tools.datetool.cul_date(max(plan_finish_date_list), bp_po_adj + max(coa, lt) + pt)
                 shop_consume = order_strategy.cul_shop_consume(goods_id, wh_id, start_date2, end_date2)
                 stocking_up_num = max(shop_consume, 0)
 
-                # 原料备货量 = [ max(计划上市日期)+首批到仓周期+PT+1天, max(计划上市日期)+首批到仓周期+PT+MT] 周期内【门店消耗】
+                # 原料备货量 = [ max(计划上市日期)+调整后BP-PO+max(COA, LT)+PT+1天, max(计划上市日期)+调整后BP-PO+max(COA, LT)+PT+MT] 周期内【门店消耗】
                 start_date3 = lk_tools.datetool.cul_date(max(plan_finish_date_list), bp_po_adj + max(coa, lt) + pt + 1)
                 end_date3 = lk_tools.datetool.cul_date(max(plan_finish_date_list), bp_po_adj + max(coa, lt) + pt + mt)
                 shop_consume = order_strategy.cul_shop_consume(goods_id, wh_id, start_date3, end_date3)
                 material_pre_num = max(shop_consume, 0)
             elif scene == '4':
-                # 首批到仓量 = [ min(计划上市日期), min(计划上市日期)+BP-PO+max(COA, LT)] 周期内【门店消耗】
+                # 首批到仓量 = [ min(计划上市日期), min(计划上市日期)+调整后BP-PO+max(COA, LT)] 周期内【门店消耗】
                 start_date1 = min(plan_finish_date_list)
                 end_date1 = lk_tools.datetool.cul_date(min(plan_finish_date_list), bp_po_adj + max(coa, lt))
                 shop_consume = order_strategy.cul_shop_consume(goods_id, wh_id, start_date1, end_date1)
                 first_batch_num = max(shop_consume, 0)
 
-                # 成品备货量 = [ min(计划上市日期)+首批到仓周期+1天, min(计划上市日期)+首批到仓周期+PT] 周期内【门店消耗】
+                # 成品备货量 = [ min(计划上市日期)+调整后BP-PO+max(COA, LT)+1天, min(计划上市日期)+调整后BP-PO+max(COA, LT)+PT] 周期内【门店消耗】
                 start_date2 = lk_tools.datetool.cul_date(min(plan_finish_date_list), bp_po_adj + max(coa, lt) + 1)
                 end_date2 = lk_tools.datetool.cul_date(min(plan_finish_date_list), bp_po_adj + max(coa, lt) + pt)
                 shop_consume = order_strategy.cul_shop_consume(goods_id, wh_id, start_date2, end_date2)
                 stocking_up_num = max(shop_consume, 0)
 
-                # 原料备货量 = [ min(计划上市日期)+首批到仓周期+PT+1天, min(计划上市日期)+首批到仓周期+PT+MT] 周期内【门店消耗】
+                # 原料备货量 = [ min(计划上市日期)+调整后BP-PO+max(COA, LT)+PT+1天, min(计划上市日期)+调整后BP-PO+max(COA, LT)+PT+MT] 周期内【门店消耗】
                 start_date3 = lk_tools.datetool.cul_date(min(plan_finish_date_list), bp_po_adj + max(coa, lt) + pt + 1)
                 end_date3 = lk_tools.datetool.cul_date(min(plan_finish_date_list), bp_po_adj + max(coa, lt) + pt + mt)
                 shop_consume = order_strategy.cul_shop_consume(goods_id, wh_id, start_date3, end_date3)
@@ -358,23 +358,23 @@ def cul_po_new(goods_id, wh_id, scene, plan_finish_date_list: list, po_new_param
                 start_date3, end_date3, material_pre_num = '', '', 0
     else:
         # 非中心仓
-        # 首批到仓周期 = 调整后BP-PO + max(coa, lt) + 调整后WT
         if food_flag:
             if scene == '1' or scene == '2':
+                # 首批到仓周期 = 调整后BP-PO + max(coa, lt) + 调整后WT
                 # 首批到仓量 = [计划上市日期, 计划上市日期+调整后BP-PO+max(coa, lt)+调整后WT]周期内【门店消耗】
                 start_date1 = plan_finish_date_list[0]
                 end_date1 = lk_tools.datetool.cul_date(plan_finish_date_list[0], bp_po_adj + max(coa, lt) + wt_adj)
                 shop_consume = order_strategy.cul_shop_consume(goods_id, wh_id, start_date1, end_date1)
                 first_batch_num = max(shop_consume, 0)
 
-                # 成品备货量 = [计划上市日期, 计划上市日期+首批到仓周期+pt]周期内【门店消耗】
+                # 成品备货量 = [计划上市日期, 计划上市日期+调整后BP-PO+max(coa, lt)+pt]周期内【门店消耗】
                 start_date2 = plan_finish_date_list[0]
                 end_date2 = lk_tools.datetool.cul_date(plan_finish_date_list[0], bp_po_adj + max(coa, lt) + pt)
                 shop_consume = order_strategy.cul_shop_consume(goods_id, wh_id, start_date2, end_date2)
                 # 成品备货量 = max(门店消耗量 - 调整后首批到仓量, 0)
                 stocking_up_num = max(shop_consume - first_batch_num, 0)
 
-                # 原料备货量 = [计划上市日期, 计划上市日期+首批到仓周期+pt+mt]周期内【门店消耗】
+                # 原料备货量 = [计划上市日期, 计划上市日期+调整后BP-PO+max(coa, lt)+pt+mt]周期内【门店消耗】
                 start_date3 = plan_finish_date_list[0]
                 end_date3 = lk_tools.datetool.cul_date(
                     plan_finish_date_list[0], bp_po_adj + max(coa, lt) + pt + mt
