@@ -15,6 +15,8 @@ SELECT * FROM t_bi_warehouse_shop_detail
 WHERE
   wh_dept_id in ('327193', '245971', '245871', '326932', '326327', '-1')
   AND record_date in ();
+  
+数仓-仓库门店详情表: t_bi_warehouse_shop_detail
 
 """
 
@@ -46,8 +48,8 @@ sql_insert_value = mysql_sql['val_bi_warehouse_shop_detail']
 
 val_data = ''
 val_sql = sql_insert_value + ',\n'
-for wh in wh_dept_id:
-    for date_val in date_list:
+for date_val in date_list:
+    for wh in wh_dept_id:
         self_num = random.randint(50, 300)
         agent_num = random.randint(10, self_num)
         self_operating_num = random.randint(50, 300)

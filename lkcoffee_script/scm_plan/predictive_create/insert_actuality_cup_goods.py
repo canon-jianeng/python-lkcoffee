@@ -16,7 +16,7 @@ SELECT * FROM t_actuality_cup_goods
 WHERE 
   `year`='2023' 
   AND wh_dept_id in ('327193', '245971', '245871', '326932', '326327', '-1') 
-  AND goods_id in ('42', '48214', '82796', '44', '83070', '83622', '83623') 
+  AND goods_id in ('42', '48214', '82796', '44', '83070', '86969', '83207', '83622', '83623') 
   AND type in ('10', '20', '30', '40');
 
 """
@@ -25,9 +25,11 @@ WHERE
 now_year = int(datetime.datetime.now().strftime('%Y'))
 now_month = int(datetime.datetime.now().strftime('%m'))
 # 年份列表
-year_list = [now_year-1, now_year]
+year_list = [now_year+1]
+# year_list = [now_year-1, now_year, now_year+1]
 
 goods_dict = {
+    # 10:损耗率,20:实际消耗量,30:用售比系数,40:冷比例系数
     # 饮品
     # 新品有冷比例系数
     '42': ['10', '20', '40'],
@@ -36,6 +38,8 @@ goods_dict = {
     '82796': ['10', '20', '30', '40'],
     '44': ['10', '20'],
     '83070': ['10', '20'],
+    '86969': ['10', '20'],
+    '83207': ['10', '20'],
     # 食品
     '83622': ['10', '20'],
     '83623': ['10', '20']

@@ -15,6 +15,8 @@ WHERE
   goods_id in ('42', '44', '83070', '82796', '83623') 
   AND wh_dept_id in ('327193', '245971', '245871', '326932', '326327', '-1') 
   AND predict_dt in ();
+  
+货物预测表(常规品): alg_purchase_normal_goods_demand
 
 """
 

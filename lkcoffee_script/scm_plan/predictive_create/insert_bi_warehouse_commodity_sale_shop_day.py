@@ -12,6 +12,8 @@ from lkcoffee_script import lk_tools
 查询数据是否存在:
 
 
+售卖门店数-实际(日纬度): t_bi_warehouse_commodity_sale_shop_day
+
 """
 
 # 去年到前一天的日期
