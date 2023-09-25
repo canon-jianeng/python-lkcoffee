@@ -84,7 +84,6 @@ cursor.execute(
 data = cursor.fetchall()
 for date_val in data:
     week_list.append(date_val)
-# print(week_list)
 
 
 val_data = ''

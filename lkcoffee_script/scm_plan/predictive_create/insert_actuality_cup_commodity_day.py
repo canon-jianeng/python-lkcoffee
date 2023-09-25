@@ -30,8 +30,8 @@ date_list_now = lk_tools.datetool.get_yesterday_last_date()
 date_list = date_list_last_year + date_list_now
 
 # 增量数据
-start_day = '2023-07-24'
-end_day = '2023-08-13'
+start_day = '2023-08-13'
+end_day = '2023-09-24'
 add_day_list = []
 for date_val in date_list:
     compare_val = lk_tools.datetool.date_compare(start_day, end_day, date_val)
@@ -40,12 +40,12 @@ for date_val in date_list:
 print(add_day_list)
 date_list = add_day_list
 
-
 commodity_list = [
     # 饮品
     5352, 5990, 6192,
     # 食品
-    801, 800
+    801, 800,
+    6967, 6973, 6991, 6992
 ]
 wh_dept_id = [
     '327193', '245971', '245871', '326932', '326327', '-1'
