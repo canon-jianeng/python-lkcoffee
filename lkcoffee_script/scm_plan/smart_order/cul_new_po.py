@@ -110,13 +110,19 @@ def cul_new_purchase_amount(goods_id, spec_id, purchase_ratio, wh_list, min_date
         if len(new_list[2]) > 0:
             commodity_id = new_list[2][0]
             sale_shop_num, sale_shop_days1 = order_strategy.get_sale_shop_total(wh_id, commodity_id, new_range1)
-            sale_shop_num1 += sale_shop_num / sale_shop_days1
+            if sale_shop_days1 == 0:
+                sale_shop_num1 = 0
+            else:
+                sale_shop_num1 += sale_shop_num / sale_shop_days1
             print('仓库售卖门店数:', sale_shop_num, sale_shop_days1)
             # 实际新品备货周期(过滤新品首采周期)
             new_range2 = lk_tools.datetool.get_date_difference_set(new_range1, new_range2)
             if len(new_range2) > 0:
                 sale_shop_num, sale_shop_days2 = order_strategy.get_sale_shop_total(wh_id, commodity_id, new_range2)
-                sale_shop_num2 += sale_shop_num / sale_shop_days2
+                if sale_shop_days2 == 0:
+                    sale_shop_num2 = 0
+                else:
+                    sale_shop_num2 += sale_shop_num / sale_shop_days2
             # 实际新品备料周期(过滤新品备货周期)
             if len(new_range2) > 0:
                 new_range3 = lk_tools.datetool.get_date_difference_set(new_range2, new_range3)
@@ -124,7 +130,10 @@ def cul_new_purchase_amount(goods_id, spec_id, purchase_ratio, wh_list, min_date
                 new_range3 = lk_tools.datetool.get_date_difference_set(new_range1, new_range3)
             if len(new_range3) > 0:
                 sale_shop_num, sale_shop_days3 = order_strategy.get_sale_shop_total(wh_id, commodity_id, new_range3)
-                sale_shop_num3 += sale_shop_num / sale_shop_days3
+                if sale_shop_days3 == 0:
+                    sale_shop_num3 = 0
+                else:
+                    sale_shop_num3 += sale_shop_num / sale_shop_days3
         first_batch_num += new_list[0][0]
         stocking_up_num += new_list[0][1]
         material_pre_num += new_list[0][2]
