@@ -2,7 +2,7 @@
 import pandas as pd
 import numpy as np
 
-file_path = '../data/part-0.csv'
+file_path = '../data/stock_simulation_without_cg_trs.csv'
 # 选择不读取第一列: index_col=0
 df = pd.read_csv(file_path)
 

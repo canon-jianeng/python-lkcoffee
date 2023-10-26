@@ -16,21 +16,24 @@ columns = df.columns
 print(columns)
 
 # 查询条件
-data_condition = (df["shop_dept_id"] == 326006) & (df["goods_id"] == 4488) & (df["dt"] == '2023-08-03')
+# 测试数据日期: 2023-10-23
+data_condition = (df["dt"] == '2023-10-24')
+# data_condition = (df["shop_dept_id"] == 326006) & (df["goods_id"] == 4488) & (df["dt"] == '2023-08-03')
 query_data = df.loc[
     data_condition
 ]
 
-print(type(query_data))
-print(query_data['plan_finish_date'])
-print(query_data['next_plan_finish_date'])
+print(query_data)
+# print(type(query_data))
+# print(query_data['plan_finish_date'])
+# print(query_data['next_plan_finish_date'])
 
 # 修改数据
 # df.loc[
 #     data_condition,
 #     # 赋值的字段
-#     'next_plan_finish_date'
-# ] = '2023-08-10'
+#     'dt'
+# ] = '2023-10-24'
 
 # 数据写入文件
 # 不存储 index 信息: index=False
