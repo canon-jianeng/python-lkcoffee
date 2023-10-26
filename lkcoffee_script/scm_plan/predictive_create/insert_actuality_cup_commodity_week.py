@@ -28,7 +28,8 @@ commodity_list = [
     # 饮品
     5352, 5990, 6192,
     # 食品
-    801, 800
+    801, 800,
+    6967, 6973, 6991, 6992
 ]
 wh_dept_id = [
     '327193', '245971', '245871', '326932', '326327', '-1'
@@ -81,8 +82,8 @@ for date_val in data:
 
 
 # 增量周
-start_week_id = 99
-end_week_id = 102
+start_week_id = 102
+end_week_id = 109
 add_week_list = []
 cursor.execute(
     sql_query.format(now_year)

@@ -6,8 +6,8 @@ from lkcoffee_script import lk_tools
 
 """
 查询是否重复
-SELECT `year`, record_date, wh_dept_id FROM t_actuality_cup_total_day 
-GROUP BY record_date, wh_dept_id HAVING count(*) > 1;
+SELECT `year`, record_date, wh_dept_id, type FROM t_actuality_cup_total_day 
+GROUP BY record_date, wh_dept_id, type HAVING count(*) > 1;
 
 查询数据是否存在:
 SELECT * FROM t_actuality_cup_total_day 
@@ -30,8 +30,8 @@ date_list_now = lk_tools.datetool.get_yesterday_last_date()
 date_list = date_list_last_year + date_list_now
 
 # 增量数据
-start_day = '2023-07-24'
-end_day = '2023-08-13'
+start_day = '2023-08-14'
+end_day = '2023-09-24'
 add_day_list = []
 for date_val in date_list:
     compare_val = lk_tools.datetool.date_compare(start_day, end_day, date_val)

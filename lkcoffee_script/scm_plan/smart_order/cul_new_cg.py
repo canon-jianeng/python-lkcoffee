@@ -94,9 +94,9 @@ def cul_cg_new(goods_id, wh_id, scene, plan_finish_date_list: list, po_new_param
 
     if central_flag:
         # 中心仓
-        # 首批到仓周期 = 调整后BP-PO + max(coa, lt)
         if food_flag:
             if scene == '1' or scene == '2':
+                # 首批到仓周期 = 调整后BP-PO + max(coa, lt)
                 # 首批到仓量 = [计划上市日期, 计划上市日期+BP-PO+max(coa, lt)]周期内【门店消耗】
                 start_date = plan_finish_date_list[0]
                 end_date = lk_tools.datetool.cul_date(plan_finish_date_list[0], bp_po_adj + max(coa, lt))
@@ -145,9 +145,9 @@ def cul_cg_new(goods_id, wh_id, scene, plan_finish_date_list: list, po_new_param
                 cg_new_num = 0
     else:
         # 非中心仓
-        # 首批到仓周期 = 调整后BP-PO + max(coa, lt) + 调整后WT
         if food_flag:
             if scene == '1' or scene == '2':
+                # 首批到仓周期 = 调整后BP-PO + max(coa, lt) + 调整后WT
                 # 首批到仓量 = [计划上市日期, 计划上市日期+调整后BP-PO+max(coa, lt)+调整后WT]周期内【门店消耗】
                 start_date = plan_finish_date_list[0]
                 end_date = lk_tools.datetool.cul_date(plan_finish_date_list[0], bp_po_adj + max(coa, lt) + wt_adj)

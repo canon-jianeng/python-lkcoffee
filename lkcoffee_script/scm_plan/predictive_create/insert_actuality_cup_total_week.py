@@ -7,8 +7,8 @@ from lkcoffee_script import lk_tools
 
 """
 查询是否重复
-SELECT wh_dept_id, week_id FROM t_actuality_cup_total_week 
-GROUP BY wh_dept_id, week_id HAVING count(*) > 1;
+SELECT wh_dept_id, week_id, type FROM t_actuality_cup_total_week 
+GROUP BY wh_dept_id, week_id, type HAVING count(*) > 1;
 
 查询数据是否存在:
 SELECT wh_dept_id, week_id FROM t_actuality_cup_total_week 
@@ -78,8 +78,8 @@ for date_val in data:
 
 
 # 增量周
-start_week_id = 99
-end_week_id = 102
+start_week_id = 103
+end_week_id = 109
 add_week_list = []
 cursor.execute(
     sql_query.format(now_year)

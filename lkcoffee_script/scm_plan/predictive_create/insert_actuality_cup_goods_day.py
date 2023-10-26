@@ -31,7 +31,10 @@ date_list_last_year = lk_tools.datetool.get_month_date(str(now_year-1)+'-12')
 # 当前年日期
 date_list_now = lk_tools.datetool.get_month_date(str(now_year)+'-12')
 
-date_list = date_list_last_year + date_list_now
+# 明年日期
+date_list_next_year = lk_tools.datetool.get_month_date(str(now_year+1)+'-12')
+
+date_list = date_list_last_year + date_list_now + date_list_next_year
 
 wh_dept_id = [
     '327193', '245971', '245871', '326932', '326327', '-1'
@@ -44,6 +47,8 @@ goods_dict = {
     '82796': ['20', '40'],
     '44': ['20'],
     '83070': ['20'],
+    '86969': ['20'],
+    '83207': ['20'],
     # 食品
     '83622': ['20'],
     '83623': ['20']

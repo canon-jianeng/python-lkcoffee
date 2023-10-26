@@ -16,6 +16,8 @@ WHERE
   AND wh_dept_id in ('327193', '245971', '245871', '326932', '326327', '-1') 
   AND predict_dt in ();
 
+新品首采未来N天商品杯量预测表: t_alg_purchase_wh_com_pred_future
+
 """
 
 # 当前年份
@@ -24,16 +26,19 @@ now_year = int(datetime.datetime.now().strftime('%Y'))
 # 过去实际数据
 # 前一年日期
 date_list_last_year = lk_tools.datetool.get_month_date(str(now_year-1)+'-12')
+
+# 当前年日期（当前年1月1号到前一天日期的日期列表）
+date_list_now = lk_tools.datetool.get_month_date(str(now_year)+'-12')
+
 # 获取当前年1月1号到前一天日期的日期列表
-date_list_now = lk_tools.datetool.get_yesterday_last_date()
-
+# date_list_now = lk_tools.datetool.get_yesterday_last_date()
 # 预测当前月及未来的3个月
-now_month = datetime.datetime.now().strftime('%Y-%m')
-date_list_pre = lk_tools.datetool.get_future_date(now_month, 3)
+# now_month = datetime.datetime.now().strftime('%Y-%m')
+# date_list_pre = lk_tools.datetool.get_future_date(now_month, 3)
 
-# 明年1月份日期
-date_list_next_year = lk_tools.datetool.get_year_month_date(now_year+1, 1)
-date_list = date_list_last_year + date_list_now + date_list_pre + date_list_next_year
+# 明年日期
+date_list_next_year = lk_tools.datetool.get_month_date(str(now_year+1)+'-12')
+date_list = date_list_last_year + date_list_now + date_list_next_year
 
 
 wh_dept_id = [
@@ -41,7 +46,7 @@ wh_dept_id = [
 ]
 
 # 新品
-commodity_list = [5990, 6192, 801]
+commodity_list = [5990, 6192, 801, 6967, 6973, 6991, 6992]
 
 
 with open('./sql.yml', encoding='utf-8') as f:
@@ -66,6 +71,7 @@ for commodity in commodity_list:
                 amount = 0
             else:
                 amount_num = random.uniform(0, 20)
+                # 汇总各个仓数量
                 amount += amount_num
                 val_str = val_sql.format(
                     date_val, commodity, wh, amount_num

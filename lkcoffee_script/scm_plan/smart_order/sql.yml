@@ -103,7 +103,7 @@ sql:
       FROM t_alg_new_demand_plan 
       WHERE goods_id={} AND wh_dept_id={} AND predict_date >= '{}' AND predict_date <= '{}';"
     query_new_scene:
-      "SELECT IFNULL(scene_type, 0), commodity_plan_launch_dates 
+      "SELECT IFNULL(scene_type, 0), commodity_plan_launch_dates, commodity_ids 
       FROM t_bi_new_warehouse_goods_online_scene 
       WHERE goods_id={} AND wh_dept_id={} AND mark_type={}"
     query_po_new_param:
@@ -124,6 +124,23 @@ sql:
       WHERE material_id={} AND wh_dept_id={} AND material_type={};"
     query_large_class_id:
       "SELECT large_class FROM t_stock_goods WHERE id={};"
+    query_sale_shop_definite:
+      "SELECT `id` FROM t_version_sale_shop WHERE definite_flag=1 AND deleted=0 AND `year`={}"
+    query_sale_shop_v0:
+      "SELECT `id` FROM t_version_sale_shop WHERE version_num=0 AND deleted=0 AND `year`={}"
+    query_future_sale_shop:
+      "SELECT shop_day.amount 
+       FROM t_prediction_commodity_sale_shop shop
+       LEFT JOIN t_prediction_commodity_sale_shop_day shop_day ON shop_day.sale_shop_id=shop.id
+       WHERE 
+        shop.version_id='{}' AND shop.wh_dept_id={} AND shop.commodity_id={} AND shop.`year`={} AND shop_day.type=30
+       	AND shop_day.record_date='{}'"
+    query_actual_sale_shop:
+      "SELECT amount 
+       FROM t_bi_warehouse_commodity_sale_shop_day 
+       WHERE 
+        wh_dept_id={} AND commodity_id={} AND `year`={} AND type=30
+       	AND record_date='{}'"
   dm:
     query_central_data:
       "SELECT config_data FROM t_dp_config WHERE config_name='自动CG仓货模式配置';"

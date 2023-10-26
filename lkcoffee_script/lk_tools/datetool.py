@@ -213,6 +213,29 @@ def date_compare(left_day, right_day, day_val):
         return False
 
 
+def get_date_difference_set(left_list, right_list):
+    # ['2023-09-20', '2024-02-01'] 和 ['2023-09-20', '2024-02-07'] 结果返回: ['2024-02-02', '2024-02-07']
+    left_date = left_list[-1]
+    right_date1 = right_list[0]
+    right_date2 = right_list[1]
+    if left_date > right_date2:
+        right_list = []
+    else:
+        if left_date > right_date1:
+            right_list[0] = cul_date(left_date, 1)
+    return right_list
+
+
+def get_future_date_list(date_list):
+    # 获取大于今天的日期列表
+    future_list = []
+    now_date = str_to_date(get_now_date())
+    for date_day in date_list:
+        if str_to_date(date_day) >= now_date:
+            future_list.append(date_day)
+    return future_list
+
+
 if __name__ == '__main__':
     # print(get_month_date('2022-12', 4))
     print(get_future_date('2023-07', 3))
@@ -225,3 +248,4 @@ if __name__ == '__main__':
     print(cul_date('2023-08-18', -1))
     print(get_date_val("2022-07-05"))
     print(date_compare('2023-07-24', '2023-08-13', '2023-08-01'))
+    print(get_now_time())
