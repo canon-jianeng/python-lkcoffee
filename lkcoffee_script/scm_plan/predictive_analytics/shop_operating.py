@@ -47,11 +47,13 @@ sql_operating_rate = mysql_sql['query_operating_rate']
 
 
 def pred_wh_init_shop(wh_id, date_val):
-    # 查询预测初始日期 (t_bi_warehouse_shop_detail 表)
+    # 查询初始日期 (t_bi_warehouse_shop_detail 表), 作为过去日期和预测日期的初始日期计算门店数增量
     cursor.execute(sql_pred_shop.format(wh_id))
     data = cursor.fetchall()
     record_date = ''
     shop_num = 0
+    # 昨天日期
+    cur_date_1 = (datetime.datetime.now() - datetime.timedelta(days=1)).date()
     for value in data:
         if value[0] < cur_date_1:
             # 小于昨天的日期, 获取最近存在数据的日期
@@ -68,6 +70,7 @@ def pred_wh_init_shop(wh_id, date_val):
 
 
 def pred_country_shop(month_num: int):
+    # 预测-全国营业门店数
     country_num_cur = 0
     country_num_last = 0
     country_date_num = 0
@@ -120,7 +123,27 @@ def expand_shop_increment(year_val, month_key, wh_id):
     else:
         agent_interval_num = int(data[0][0] / cur_month_num)
     # print(agent_interval_num)
-    return self_interval_num+agent_interval_num
+    return self_interval_num + agent_interval_num
+
+
+def cul_increment_shop():
+    increment = 0
+    # 判断是否同一个月
+    if month_value == record_date.split('-')[1]:
+        # 初始日期到当前日期的天数 * 月增量
+        interval_day = (cur_date - record_date).days
+        increment_num = 0
+        increment = interval_day * increment_num
+    else:
+        # 初始日期到初始日期的月末的天数 * 月增量
+        interval_day = (cur_date - record_date).days
+        # 初始日期和当前日期相差的月份，月增量 * 天数
+        month_num = (cur_date - record_date).month - 1
+        # 当前日期的月初到当前日期的天数 * 月增量
+        interval_day = (cur_date - record_date).days
+        # 预测日期到预测初始日期的天数
+        interval_day = (cur_date - record_date).days
+        increment_num = 0
 
 
 def cul_pred_operating_shop(wh_id, date_val, flag_country=0):
@@ -131,8 +154,8 @@ def cul_pred_operating_shop(wh_id, date_val, flag_country=0):
     month_val = str(int(year_val) - 1) + '-' + month_value
     # 昨天
     now_date = datetime.datetime.now()
-
     cur_date_1 = (now_date - datetime.timedelta(days=1)).date()
+
     # 营业率
     cursor.execute(sql_operating_rate.format(wh_id, month_val))
     data = cursor.fetchall()
@@ -145,15 +168,24 @@ def cul_pred_operating_shop(wh_id, date_val, flag_country=0):
     shop_tuple = pred_wh_init_shop(wh_id)
     record_date = shop_tuple[0]
     shop_num = shop_tuple[1]
-    # 判断是否同一个月
-    # if cur_date
-    # 初始日期到月末的天数*月增量
-    # 相差几个月，月的增量*天数
-    # 当前日期的月初到当前日期的天数*月增量
-    # 预测日期到预测初始日期的天数
-    interval_day = (cur_date - record_date).days
 
-    increment_num = 0
+    increment = 0
+    # 判断是否同一个月
+    if month_value == record_date.split('-')[1]:
+        # 初始日期到当前日期的天数 * 月增量
+        interval_day = (cur_date - record_date).days
+        increment_num = 0
+        increment = interval_day * increment_num
+    else:
+        # 初始日期到初始日期的月末的天数 * 月增量
+        interval_day = (cur_date - record_date).days
+        # 初始日期和当前日期相差的月份，月增量 * 天数
+        month_num = (cur_date - record_date).month - 1
+        # 当前日期的月初到当前日期的天数 * 月增量
+        interval_day = (cur_date - record_date).days
+        # 预测日期到预测初始日期的天数
+        interval_day = (cur_date - record_date).days
+        increment_num = 0
 
     # 预测营业门店数
     if flag_country == 1 and str(wh_id) == '-1':

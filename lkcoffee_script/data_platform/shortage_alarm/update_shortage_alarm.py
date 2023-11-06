@@ -9,8 +9,8 @@ UPDATE t_dm_wh_stock_shortage_alarm SET supplier_no='SC004990', supplier_name='�
 
 old_good_id = '11685'
 old_spec_id = '26357'
-old_wh_name = '南宁仓库'
-old_wh_dept_id = '329234'
+old_wh_name = '南昌仓库'
+old_wh_dept_id = '326921'
 
 new_wh_dict = {'wh_dept_id': '326123', 'wh_code': 'WH00380', 'wh_name': '上海仓库'}
 new_goods_dict = {'goods_id': '86948', 'goods_code': 'GS02336', 'goods_name': '巧克力味曲奇'}
