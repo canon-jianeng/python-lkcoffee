@@ -69,8 +69,8 @@ def pred_wh_init_shop(wh_id, date_val):
     return record_date, shop_num
 
 
-def pred_country_shop(month_num: int):
-    # 预测-全国营业门店数
+def country_shop_increment(month_num: int):
+    # 任意一个月的全国门店数增量
     country_num_cur = 0
     country_num_last = 0
     country_date_num = 0
@@ -90,6 +90,34 @@ def pred_country_shop(month_num: int):
     return country_num
 
 
+def cul_country_shop(init_str, cur_str):
+    increment_shop = 0
+    init_date = lk_tools.datetool.str_to_date(init_str)
+    cur_date = lk_tools.datetool.str_to_date(cur_str)
+    # 判断是否相同年月
+    if (init_date.year == cur_date.year
+            and init_date.month == cur_date.month):
+        interval_day = (cur_date - init_date).days
+        increment_num = 0
+        # 初始日期到当前日期的天数 * 月增量
+        increment_shop = interval_day * increment_num
+    else:
+        # 初始日期到初始日期的月末的天数 * 月增量
+        interval_day = (lk_tools.datetool.get_month_end(init_str) - init_date).days
+        increment_num = country_shop_increment(init_date.month)
+        increment_shop += interval_day * increment_num
+        # 初始日期和当前日期相差的月份，月增量 * 天数
+        month_data = lk_tools.datetool.get_diff_month_num(init_str, cur_str)
+        for month_val in month_data:
+            increment_num = country_shop_increment(month_val['month'])
+            increment_shop += month_val['days'] * increment_num
+        # 当前日期的月初到当前日期的天数 * 月增量
+        interval_day = (cur_date - lk_tools.datetool.get_month_start(cur_str)).days
+        increment_num = country_shop_increment(cur_date.month)
+        increment_shop += interval_day * increment_num
+    return increment_shop
+
+
 def actual_wh_shop(wh_id, date_val):
     date_tuple = date_val.split('-')
     # 实际门店数(查询过去有数据的日期，按每月增量进行计算出对应日期的数量)
@@ -105,8 +133,9 @@ def actual_wh_shop(wh_id, date_val):
 
 
 def expand_shop_increment(year_val, month_key, wh_id):
+    # 任意一个月的拓展门店数增量
     # 对应月的天数
-    cur_month_num = lk_tools.datetool.get_month_end_date(int(year_val), int(month_key))
+    cur_month_num = lk_tools.datetool.get_month_days(int(year_val), int(month_key))
     # 自营门店
     cursor.execute(sql_cp01_num.format(month_key, year_val, wh_id))
     data = cursor.fetchall()
@@ -126,24 +155,32 @@ def expand_shop_increment(year_val, month_key, wh_id):
     return self_interval_num + agent_interval_num
 
 
-def cul_increment_shop():
-    increment = 0
-    # 判断是否同一个月
-    if month_value == record_date.split('-')[1]:
-        # 初始日期到当前日期的天数 * 月增量
-        interval_day = (cur_date - record_date).days
+def cul_wh_expand_shop(wh_id, init_str, cur_str):
+    increment_shop = 0
+    init_date = lk_tools.datetool.str_to_date(init_str)
+    cur_date = lk_tools.datetool.str_to_date(cur_str)
+    # 判断是否相同年月
+    if (init_date.year == cur_date.year
+            and init_date.month == cur_date.month):
+        interval_day = (cur_date - init_date).days
         increment_num = 0
-        increment = interval_day * increment_num
+        # 初始日期到当前日期的天数 * 月增量
+        increment_shop = interval_day * increment_num
     else:
         # 初始日期到初始日期的月末的天数 * 月增量
-        interval_day = (cur_date - record_date).days
+        interval_day = (lk_tools.datetool.get_month_end(init_str) - init_date).days
+        increment_num = expand_shop_increment(init_date.year, init_date.month, wh_id)
+        increment_shop += interval_day * increment_num
         # 初始日期和当前日期相差的月份，月增量 * 天数
-        month_num = (cur_date - record_date).month - 1
+        month_data = lk_tools.datetool.get_diff_month_num(init_str, cur_str)
+        for month_val in month_data:
+            increment_num = expand_shop_increment(month_val['year'], month_val['month'], wh_id)
+            increment_shop += month_val['days'] * increment_num
         # 当前日期的月初到当前日期的天数 * 月增量
-        interval_day = (cur_date - record_date).days
-        # 预测日期到预测初始日期的天数
-        interval_day = (cur_date - record_date).days
-        increment_num = 0
+        interval_day = (cur_date - lk_tools.datetool.get_month_start(cur_str)).days
+        increment_num = expand_shop_increment(cur_date.year, cur_date.month, wh_id)
+        increment_shop += interval_day * increment_num
+    return increment_shop
 
 
 def cul_pred_operating_shop(wh_id, date_val, flag_country=0):
@@ -169,30 +206,15 @@ def cul_pred_operating_shop(wh_id, date_val, flag_country=0):
     record_date = shop_tuple[0]
     shop_num = shop_tuple[1]
 
-    increment = 0
-    # 判断是否同一个月
-    if month_value == record_date.split('-')[1]:
-        # 初始日期到当前日期的天数 * 月增量
-        interval_day = (cur_date - record_date).days
-        increment_num = 0
-        increment = interval_day * increment_num
-    else:
-        # 初始日期到初始日期的月末的天数 * 月增量
-        interval_day = (cur_date - record_date).days
-        # 初始日期和当前日期相差的月份，月增量 * 天数
-        month_num = (cur_date - record_date).month - 1
-        # 当前日期的月初到当前日期的天数 * 月增量
-        interval_day = (cur_date - record_date).days
-        # 预测日期到预测初始日期的天数
-        interval_day = (cur_date - record_date).days
-        increment_num = 0
-
     # 预测营业门店数
     if flag_country == 1 and str(wh_id) == '-1':
-        country_num = pred_country_shop(int(month_value.lstrip('0')))
-        total_shop = (shop_num + country_num * interval_day) * rate
+        # 全国纬度, 取开店计划的增量门店数
+        country_increase_num = pred_country_shop(int(month_value.lstrip('0')))
+        total_shop = (shop_num + country_increase_num) * rate
     else:
-        total_shop = (shop_num + increment_num * interval_day) * rate
+        # 仓库纬度，取拓展计划的增量门店数
+        wh_increase_num = cul_wh_expand_shop(wh_id, record_date, cur_date)
+        total_shop = (shop_num + wh_increase_num) * rate
     print(wh_id, total_shop)
     return total_shop
 

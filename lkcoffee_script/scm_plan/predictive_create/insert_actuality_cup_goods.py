@@ -60,7 +60,7 @@ sql_query_cup = mysql_sql['query_actuality_cup_goods_day']
 
 
 def get_month_num(year: int, month: int, wh_val, goods_id, type_val):
-    end_date = lk_tools.datetool.get_month_end_date(year, month)
+    end_date = lk_tools.datetool.get_month_days(year, month)
     # 查询一个月的数量
     cursor.execute(
         sql_query_cup.format(

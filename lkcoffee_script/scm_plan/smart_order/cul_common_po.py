@@ -28,7 +28,7 @@ def get_date_range(num: int, finish_flag=0):
         # +2计划完成日期
         date_val = str(year_num) + '-' + month_val + '-' + str(15)
     else:
-        day_num = lk_tools.datetool.get_month_end_date(year_num, month_num)
+        day_num = lk_tools.datetool.get_month_days(year_num, month_num)
         date_val = str(year_num) + '-' + month_val + '-' + str(day_num)
     return now_val, date_val
 

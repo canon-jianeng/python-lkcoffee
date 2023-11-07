@@ -9,7 +9,7 @@ now_year = now_time.year
 now_month = now_time.month
 now_day = now_time.day
 
-now_month_days = lk_tools.datetool.get_month_end_date(now_year, now_month)
+now_month_days = lk_tools.datetool.get_month_days(now_year, now_month)
 next_month = lk_tools.datetool.get_next_month()
 
 # 当前日期 < 本月15号

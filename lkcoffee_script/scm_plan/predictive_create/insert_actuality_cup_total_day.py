@@ -30,8 +30,8 @@ date_list_now = lk_tools.datetool.get_yesterday_last_date()
 date_list = date_list_last_year + date_list_now
 
 # 增量数据
-start_day = '2023-08-14'
-end_day = '2023-09-24'
+start_day = '2023-09-25'
+end_day = '2023-11-07'
 add_day_list = []
 for date_val in date_list:
     compare_val = lk_tools.datetool.date_compare(start_day, end_day, date_val)
@@ -45,6 +45,8 @@ wh_dept_id = [
     '327193', '245971', '245871', '326932', '326327', '-1'
 ]
 
+# 10: 饮品杯量, 20: 食品店日均, 30: 饮品杯量（新品/次新品）
+# type_list = ['10', '20', '30']
 type_list = ['10', '20']
 
 with open('./sql.yml', encoding='utf-8') as f:
@@ -61,7 +63,7 @@ val_sql = sql_insert_value + ',\n'
 for type_val in type_list:
     for wh in wh_dept_id:
         for date_val in date_list:
-            amount = random.uniform(0, 20)
+            amount = random.uniform(5, 20)
             val_str = val_sql.format(
                 date_val.split('-')[0], date_val, wh, type_val, amount
             )

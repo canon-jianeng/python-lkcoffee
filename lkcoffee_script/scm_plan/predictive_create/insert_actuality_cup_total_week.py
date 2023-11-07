@@ -27,6 +27,8 @@ wh_dept_id = [
     '327193', '245971', '245871', '326932', '326327', '-1'
 ]
 
+# 10: 饮品杯量, 20: 食品店日均, 30: 饮品杯量（新品/次新品）
+# type_list = ['10', '20', '30']
 type_list = ['10', '20']
 
 with open('./sql.yml', encoding='utf-8') as f:
@@ -78,8 +80,8 @@ for date_val in data:
 
 
 # 增量周
-start_week_id = 103
-end_week_id = 109
+start_week_id = 110
+end_week_id = 126
 add_week_list = []
 cursor.execute(
     sql_query.format(now_year)
@@ -121,7 +123,7 @@ val_sql = sql_insert_value + ',\n'
 for type_val in type_list:
     for wh in wh_dept_id:
         for week_val in week_list:
-            amount = random.uniform(0, 20)
+            amount = random.uniform(5, 20)
             val_str = val_sql.format(
                 week_val[2], wh, type_val, amount
             )

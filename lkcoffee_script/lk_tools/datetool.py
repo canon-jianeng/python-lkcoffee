@@ -36,6 +36,34 @@ def cul_days(left_date, right_date):
     return day_num
 
 
+def get_month_end(date_str):
+    # 当月的最后一天
+    date_val = str_to_date(date_str)
+    days_num = get_month_days(date_val.year, date_val.month)
+    return date_val.replace(day=days_num)
+
+
+def get_month_start(date_str):
+    # 当月的第一天
+    date_val = str_to_date(date_str)
+    return date_val.replace(day=1)
+
+
+def get_diff_month_num(init_str, cur_str):
+    # 获取两个日期相差的全部月份和月份天数
+    init_date = str_to_date(init_str)
+    cur_date = str_to_date(cur_str)
+    interval = (cur_date.year - init_date.year) * 12 + (cur_date.month - init_date.month)
+    month_list = []
+    for month_val in range(1, interval):
+        date_res = init_date + relativedelta(months=month_val)
+        month_num = date_res.month
+        year_num = date_res.year
+        month_days = get_month_days(year_num, month_num)
+        month_list.append({'year': year_num, 'month': month_num, 'days': month_days})
+    return month_list
+
+
 def cul_month(date_val, month_num):
     # 某个日期+/-月数后的日期
     month_date = str_to_date(date_val) + relativedelta(months=month_num)
@@ -178,7 +206,7 @@ def get_future_date(year_month: str, future_num: int):
     return future_date + date_list
 
 
-def get_month_end_date(year: int, month: int):
+def get_month_days(year: int, month: int):
     # 第一天是星期几（0-6对应星期一到星期天）和这个月的天数
     date, month_num = calendar.monthrange(year, month)
     return month_num
@@ -238,6 +266,8 @@ def get_future_date_list(date_list):
 
 if __name__ == '__main__':
     # print(get_month_date('2022-12', 4))
+    print(get_month_start('2023-11-15'))
+    print(get_month_end('2023-11-01'))
     print(get_future_date('2023-07', 3))
     print(calendar.monthrange(2023, 7)[1])
     print(get_year_date(2022))
@@ -249,3 +279,4 @@ if __name__ == '__main__':
     print(get_date_val("2022-07-05"))
     print(date_compare('2023-07-24', '2023-08-13', '2023-08-01'))
     print(get_now_time())
+    print(get_diff_month_num('2022-08-31', '2023-11-06'))

@@ -59,7 +59,7 @@ year_list = [now_year-1, now_year]
 
 
 def get_month_num(year: int, month: int, wh_val, commodity, type_int):
-    end_date = lk_tools.datetool.get_month_end_date(year, month)
+    end_date = lk_tools.datetool.get_month_days(year, month)
     # 查询一个月的数量
     cursor.execute(
         sql_query_amount.format(

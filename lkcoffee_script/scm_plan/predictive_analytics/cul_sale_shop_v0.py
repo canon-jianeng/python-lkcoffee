@@ -159,7 +159,7 @@ def pre_day_sale_num(wh_dept_id, commodity_id, date_val, shop_way):
         last_month_num = cursor.fetchall()[0][0]
 
     # 当月天数
-    cur_month_day = lk_tools.datetool.get_month_end_date(int(cul_year), int(cul_month))
+    cur_month_day = lk_tools.datetool.get_month_days(int(cul_year), int(cul_month))
     # 门店数增量
     if wh_dept_id == '-1':
         increment_num = (cur_month_num - last_month_num) / cur_month_day
