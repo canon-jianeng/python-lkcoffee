@@ -98,7 +98,7 @@ def cul_country_shop(init_str, cur_str):
     if (init_date.year == cur_date.year
             and init_date.month == cur_date.month):
         interval_day = (cur_date - init_date).days
-        increment_num = 0
+        increment_num = country_shop_increment(cur_date.month)
         # 初始日期到当前日期的天数 * 月增量
         increment_shop = interval_day * increment_num
     else:
@@ -163,7 +163,7 @@ def cul_wh_expand_shop(wh_id, init_str, cur_str):
     if (init_date.year == cur_date.year
             and init_date.month == cur_date.month):
         interval_day = (cur_date - init_date).days
-        increment_num = 0
+        increment_num = expand_shop_increment(cur_date.year, cur_date.month, wh_id)
         # 初始日期到当前日期的天数 * 月增量
         increment_shop = interval_day * increment_num
     else:
@@ -209,7 +209,7 @@ def cul_pred_operating_shop(wh_id, date_val, flag_country=0):
     # 预测营业门店数
     if flag_country == 1 and str(wh_id) == '-1':
         # 全国纬度, 取开店计划的增量门店数
-        country_increase_num = pred_country_shop(int(month_value.lstrip('0')))
+        country_increase_num = country_shop_increment(int(month_value.lstrip('0')))
         total_shop = (shop_num + country_increase_num) * rate
     else:
         # 仓库纬度，取拓展计划的增量门店数
@@ -221,6 +221,6 @@ def cul_pred_operating_shop(wh_id, date_val, flag_country=0):
 
 if __name__ == '__main__':
     pred_wh_init_shop('245871')
-    pred_country_shop(7)
+    country_shop_increment(7)
     actual_wh_shop('245871', '2023-07-17')
     cul_pred_operating_shop('245871', '2023-07-19')

@@ -39,10 +39,10 @@ xx仓库 (仓库id: 326932, WH00393), (库存单位：8633, SU00006704)
 
 """
 
-# predict_dt_list = ['2023-06-05', '2023-06-06', '2023-06-07', '2023-06-08', '2023-06-09', '2023-06-10', '2023-06-11']
-predict_dt_list = ['2023-07-17']
+predict_dt_list = ['2023-11-06', '2023-11-07', '2023-11-08', '2023-11-09', '2023-11-10', '2023-11-11', '2023-11-12']
+# predict_dt_list = ['2023-11-08']
 commodity_id = 5990
-version_val = 7
+version_val = 244
 now_date = datetime.strptime(time.strftime('%Y-%m-%d', time.localtime()), '%Y-%m-%d').date()
 
 month_dict = {
@@ -155,6 +155,7 @@ for pred_dt in pred_dt_list:
             flag = 0
             # 实际门店数
             cursor.execute(sql_actual_shop.format(wh_id))
+            print(sql_actual_shop.format(wh_id))
             data = cursor.fetchall()
             # 获取最近存在数据的日期
             for value in data:
