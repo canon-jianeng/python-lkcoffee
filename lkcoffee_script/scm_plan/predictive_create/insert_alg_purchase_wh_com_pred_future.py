@@ -38,7 +38,8 @@ date_list_now = lk_tools.datetool.get_month_date(str(now_year)+'-12')
 
 # 明年日期
 date_list_next_year = lk_tools.datetool.get_month_date(str(now_year+1)+'-12')
-date_list = date_list_last_year + date_list_now + date_list_next_year
+# date_list = date_list_last_year + date_list_now + date_list_next_year
+date_list = date_list_now
 
 
 wh_dept_id = [
@@ -46,7 +47,8 @@ wh_dept_id = [
 ]
 
 # 新品
-commodity_list = [5990, 6192, 801, 6967, 6973, 6991, 6992]
+# commodity_list = [5990, 6192, 801, 6967, 6973, 6991, 6992]
+commodity_list = [5990]
 
 
 with open('./sql.yml', encoding='utf-8') as f:
@@ -60,8 +62,8 @@ sql_insert_value = mysql_sql['val_alg_purchase_wh_com_pred_future']
 val_data = ''
 val_sql = sql_insert_value + ',\n'
 amount = 0
-for commodity in commodity_list:
-    for date_val in date_list:
+for date_val in date_list:
+    for commodity in commodity_list:
         for wh in wh_dept_id:
             if wh == '-1':
                 val_str = val_sql.format(
@@ -70,7 +72,7 @@ for commodity in commodity_list:
                 val_data += val_str
                 amount = 0
             else:
-                amount_num = random.uniform(0, 20)
+                amount_num = random.uniform(5, 20)
                 # 汇总各个仓数量
                 amount += amount_num
                 val_str = val_sql.format(

@@ -9,22 +9,42 @@ mysql:
 
 
 sql:
-  query_wh_commodity: "SELECT wh_dept_id FROM t_alg_purchase_wh_com_pred_future WHERE predict_dt='{}' AND commodity_id={};"
+  query_wh_commodity: "SELECT wh_dept_id 
+    FROM t_alg_purchase_wh_com_pred_future 
+    WHERE predict_dt='{}' AND commodity_id={};"
   query_pred_cup_commodity: "SELECT de.cup_amount, de.record_date
     FROM t_prediction_cup_commodity co
     LEFT JOIN t_prediction_cup_commodity_day_detail de ON co.id=de.cup_commodity_id
     WHERE co.commodity_id={} AND co.version_id={} AND de.record_date='{}' AND co.wh_dept_id='{}';"
-  query_actual_cup_commodity: "SELECT cup_amount, record_date FROM t_actuality_cup_commodity_day WHERE commodity_id={} AND record_date='{}' AND wh_dept_id='{}';"
-  query_actual_shop: "SELECT record_date, total_operating_num FROM t_bi_warehouse_shop_detail WHERE wh_dept_id='{}' AND record_date like '{}%' ORDER BY record_date DESC;"
-  query_pred_shop: "SELECT record_date, total_num FROM t_bi_warehouse_shop_detail WHERE wh_dept_id='{}' ORDER BY record_date DESC;"
-  query_operating_rate: "SELECT record_date, operating_rate FROM t_bi_warehouse_shop_detail WHERE wh_dept_id='{}' AND record_date LIKE '{}%' ORDER BY record_date ASC;"
-  query_cp01_num: "SELECT {} FROM t_expand_shop_plan_summary WHERE plan_year='{}' AND wh_dept_id='{}' AND shop_oper_mode='CP01' ORDER BY summary_time DESC;"
-  query_cp02_num: "SELECT {} FROM t_expand_shop_plan_summary WHERE plan_year='{}' AND wh_dept_id='{}' AND shop_oper_mode='CP02' ORDER BY summary_time DESC;"
-  query_country_num: "SELECT de.month_of_year, de.days_of_month, de.total_num
+  query_actual_cup_commodity: "SELECT cup_amount, record_date 
+    FROM t_actuality_cup_commodity_day 
+    WHERE commodity_id={} AND record_date='{}' AND wh_dept_id='{}';"
+  query_actual_shop: "SELECT record_date, total_operating_num 
+    FROM t_bi_warehouse_shop_detail 
+    WHERE wh_dept_id='{}' AND record_date like '{}%' ORDER BY record_date DESC;"
+  query_pred_shop: "SELECT record_date, total_num 
+    FROM t_bi_warehouse_shop_detail 
+    WHERE wh_dept_id='{}' ORDER BY record_date DESC;"
+  query_operating_rate: "SELECT record_date, operating_rate 
+    FROM t_bi_warehouse_shop_detail 
+    WHERE wh_dept_id='{}' AND record_date LIKE '{}%' ORDER BY record_date ASC;"
+  query_cp01_num: "SELECT {} 
+    FROM t_expand_shop_plan_summary 
+    WHERE plan_year='{}' AND wh_dept_id='{}' AND shop_oper_mode='CP01' ORDER BY summary_time DESC;"
+  query_cp02_num: "SELECT {} 
+    FROM t_expand_shop_plan_summary 
+    WHERE plan_year='{}' AND wh_dept_id='{}' AND shop_oper_mode='CP02' ORDER BY summary_time DESC;"
+  query_country_shop_definite: "SELECT de.month_of_year, de.days_of_month, de.total_num, de.operating_rate
     FROM t_version_shop_plan ver
     LEFT JOIN t_open_shop_plan plan ON plan.version_id=ver.id
     LEFT JOIN t_open_shop_plan_detail de ON de.plan_id=plan.id
     WHERE ver.definite_flag=1;"
+  query_country_shop_v0: "SELECT de.month_of_year, de.days_of_month, de.total_num, de.operating_rate
+    FROM t_version_shop_plan ver
+    LEFT JOIN t_open_shop_plan plan ON plan.version_id=ver.id
+    LEFT JOIN t_open_shop_plan_detail de ON de.plan_id=plan.id
+    WHERE ver.definite_flag=0 AND ver.version_num=0;
+  "
   query_pred_loss_rate: "SELECT {} FROM t_prediction_cup_commodity_goods goods
     LEFT JOIN t_prediction_cup_commodity_goods_detail detail ON goods.id=detail.cup_com_goods_id
     WHERE goods.commodity_id={} AND goods.goods_id={} AND goods.version_id={} AND goods.wh_dept_id={} AND detail.type=10;"
