@@ -2,7 +2,7 @@ import time
 from datetime import datetime, timedelta
 import pymysql
 import yaml
-import shop_sale
+from ..shop_data import get_sale_num
 
 """
 商品大类: 食品
@@ -18,7 +18,7 @@ commodity_goods = {
 now_date = datetime.strptime(time.strftime('%Y-%m-%d', time.localtime()), '%Y-%m-%d').date()
 
 
-with open('./predictive_sql.yml', encoding='utf-8') as f:
+with open('../conf/predictive_sql.yml', encoding='utf-8') as f:
     yml_data = yaml.load(f, Loader=yaml.CLoader)
     mysql_sql = yml_data['sql']
     mysql_conf = yml_data['mysql']
@@ -97,10 +97,10 @@ def cul_cup_commodity(commodity_id, version_id, predict_dt_list):
             # 判断日期是否小于当天，若小于当天则为过去数据
             if cur_datetime < now_date:
                 # 实际售卖门店数
-                total_shop = shop_sale.get_actual_sale_shop(wh_id, commodity_id, dt_val)
+                total_shop = get_sale_num.get_actual_sale_shop(wh_id, commodity_id, dt_val)
             else:
                 # 预测售卖门店数
-                total_shop = shop_sale.get_pred_sale_shop(wh_id, commodity_id, dt_val)
+                total_shop = get_sale_num.get_pred_sale_shop(wh_id, commodity_id, dt_val)
             if wh_id in pred_dt_dict:
                 if commodity_id in pred_dt_dict[wh_id]:
                     pred_dt_dict[wh_id][commodity_id].update({

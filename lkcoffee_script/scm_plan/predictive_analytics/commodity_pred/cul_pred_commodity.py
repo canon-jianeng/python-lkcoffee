@@ -62,7 +62,7 @@ month_dict = {
     '12': 'december_num'
 }
 
-with open('./predictive_sql.yml', encoding='utf-8') as f:
+with open('../conf/predictive_sql.yml', encoding='utf-8') as f:
     yml_data = yaml.load(f, Loader=yaml.CLoader)
     mysql_sql = yml_data['sql']
     mysql_conf = yml_data['mysql']

@@ -10,7 +10,7 @@ from lkcoffee_script import lk_tools
 
 """
 
-with open('./predictive_sql.yml', encoding='utf-8') as f:
+with open('../conf/predictive_sql.yml', encoding='utf-8') as f:
     yml_data = yaml.load(f, Loader=yaml.CLoader)
     mysql_sql = yml_data['cul_sale_shop']
     mysql_conf = yml_data['mysql']

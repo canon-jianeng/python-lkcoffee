@@ -12,13 +12,13 @@ sql:
   query_wh_commodity: "SELECT wh_dept_id 
     FROM t_alg_purchase_wh_com_pred_future 
     WHERE predict_dt='{}' AND commodity_id={};"
-  query_pred_cup_commodity: "SELECT de.cup_amount, de.record_date
+  query_pred_cup_commodity: "SELECT co.wh_dept_id, co.commodity_id, de.record_date, de.cup_amount
     FROM t_prediction_cup_commodity co
     LEFT JOIN t_prediction_cup_commodity_day_detail de ON co.id=de.cup_commodity_id
-    WHERE co.commodity_id={} AND co.version_id={} AND de.record_date='{}' AND co.wh_dept_id='{}';"
-  query_actual_cup_commodity: "SELECT cup_amount, record_date 
+    WHERE co.version_id={} AND de.record_date>='{}' AND de.record_date<='{}';"
+  query_actual_cup_commodity: "SELECT wh_dept_id, commodity_id, record_date, cup_amount
     FROM t_actuality_cup_commodity_day 
-    WHERE commodity_id={} AND record_date='{}' AND wh_dept_id='{}';"
+    WHERE record_date>='{}' AND record_date<='{}';"
   query_actual_shop: "SELECT record_date, total_operating_num 
     FROM t_bi_warehouse_shop_detail 
     WHERE wh_dept_id='{}' AND record_date like '{}%' ORDER BY record_date DESC;"

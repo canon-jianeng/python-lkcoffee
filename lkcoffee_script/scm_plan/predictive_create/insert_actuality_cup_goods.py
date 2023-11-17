@@ -73,7 +73,7 @@ def get_month_num(year: int, month: int, wh_val, goods_id, type_val):
     return data_val[0][0]
 
 
-with open('../predictive_analytics/predictive_sql.yml', encoding='utf-8') as f:
+with open('../predictive_analytics/conf/predictive_sql.yml', encoding='utf-8') as f:
     yml_data = yaml.load(f, Loader=yaml.CLoader)
     mysql_sql = yml_data['sql']
     mysql_conf = yml_data['mysql']

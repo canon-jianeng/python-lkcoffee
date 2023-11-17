@@ -8,7 +8,7 @@ from lkcoffee_script import lk_tools
 售卖门店数-日纬度 -> 周维度/月维度
 """
 
-with open('./predictive_sql.yml', encoding='utf-8') as f:
+with open('../conf/predictive_sql.yml', encoding='utf-8') as f:
     yml_data = yaml.load(f, Loader=yaml.CLoader)
     mysql_sql = yml_data['cul_sale_shop']
     mysql_conf = yml_data['mysql']

@@ -9,7 +9,7 @@ wh_id = '-1'
 # 修改仓库的总杯量
 total_cup = 76770
 
-with open('./predictive_sql.yml', encoding='utf-8') as f:
+with open('../conf/predictive_sql.yml', encoding='utf-8') as f:
     yml_data = yaml.load(f, Loader=yaml.CLoader)
     mysql_sql = yml_data['sql2']
     mysql_conf = yml_data['mysql']

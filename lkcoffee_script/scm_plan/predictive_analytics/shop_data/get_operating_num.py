@@ -1,4 +1,5 @@
 
+import os
 import datetime
 import yaml
 import pymysql
@@ -9,6 +10,16 @@ from lkcoffee_script import lk_tools
 算法预测: 优先取售卖门店数, 若没有售卖门店数, 则取营业门店数
 
 """
+
+# 获取上级目录
+# upper_dir = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
+# file_path = upper_dir + '/conf/predictive_sql.yml'
+file_path = '../conf/predictive_sql.yml'
+with open(file_path, encoding='utf-8') as f:
+    yml_data = yaml.load(f, Loader=yaml.CLoader)
+    mysql_sql = yml_data['sql']
+    mysql_conf = yml_data['mysql']
+
 
 month_dict = {
     1: 'january_num',
@@ -25,10 +36,6 @@ month_dict = {
     12: 'december_num'
 }
 
-with open('./predictive_sql.yml', encoding='utf-8') as f:
-    yml_data = yaml.load(f, Loader=yaml.CLoader)
-    mysql_sql = yml_data['sql']
-    mysql_conf = yml_data['mysql']
 
 # 打开数据库连接
 db_cooperation = pymysql.connect(
@@ -42,8 +49,6 @@ db_cooperation = pymysql.connect(
 # 使用 cursor() 方法创建一个游标对象 cursor
 cursor = db_cooperation.cursor()
 
-sql_pred_cup_commodity = mysql_sql['query_pred_cup_commodity']
-sql_actual_cup_commodity = mysql_sql['query_actual_cup_commodity']
 sql_pred_shop = mysql_sql['query_pred_shop']
 sql_actual_shop = mysql_sql['query_actual_shop']
 sql_cp01_num = mysql_sql['query_cp01_num']
@@ -51,33 +56,6 @@ sql_cp02_num = mysql_sql['query_cp02_num']
 sql_operating_rate = mysql_sql['query_operating_rate']
 sql_country_shop_definite = mysql_sql['query_country_shop_definite']
 sql_country_shop_v0 = mysql_sql['query_country_shop_v0']
-
-
-def actual_wh_sale_shop(wh_id, date_val):
-    # 实际售卖门店数
-    date_tuple = date_val.split('-')
-    cursor.execute(sql_actual_shop.format(wh_id, date_tuple[0]))
-    data = cursor.fetchall()
-    if len(data) > 0:
-        shop_num = data[0][1]
-        date_val = data[0][0]
-    else:
-        shop_num = 0
-    print(wh_id, shop_num)
-    return shop_num
-
-
-def pred_wh_sale_shop(wh_id, date_val):
-    # 预测售卖门店数
-    cursor.execute(sql_actual_shop.format(wh_id, date_val))
-    data = cursor.fetchall()
-    if len(data) > 0:
-        shop_num = data[0][1]
-        date_val = data[0][0]
-    else:
-        shop_num = 0
-    print(wh_id, shop_num)
-    return shop_num
 
 
 def pred_wh_init_shop(wh_id):
@@ -240,7 +218,7 @@ def cul_wh_rate(wh_id, month_val):
     return rate
 
 
-def cul_pred_operating_shop(wh_id, date_val, flag_country=0):
+def cul_pred_operating_shop(wh_id, date_val):
     # 营业率
     rate = country_month_shop(lk_tools.datetool.str_to_date(date_val).month)[3]
 
@@ -250,7 +228,7 @@ def cul_pred_operating_shop(wh_id, date_val, flag_country=0):
     shop_num = shop_tuple[1]
 
     # 预测营业门店数
-    if flag_country == 1 and str(wh_id) == '-1':
+    if str(wh_id) == '-1':
         # 全国纬度, 取开店计划的增量门店数
         country_increase_num = country_increment_total(
             lk_tools.datetool.date_to_str(record_date), lk_tools.datetool.date_to_str(cur_date))

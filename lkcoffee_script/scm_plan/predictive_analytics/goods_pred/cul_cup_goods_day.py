@@ -1,8 +1,8 @@
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 import pymysql
 import yaml
-import cup_data
+from lkcoffee_script.scm_plan.predictive_analytics.conf import cup_data
 import shop_operating
 
 """
@@ -78,7 +78,7 @@ now_date = datetime.strptime(time.strftime('%Y-%m-%d', time.localtime()), '%Y-%m
 cup_num_dict = cup_data.cup_num_dict
 
 
-with open('./predictive_sql.yml', encoding='utf-8') as f:
+with open('../conf/predictive_sql.yml', encoding='utf-8') as f:
     yml_data = yaml.load(f, Loader=yaml.CLoader)
     mysql_sql = yml_data['sql']
     mysql_conf = yml_data['mysql']

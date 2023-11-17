@@ -44,7 +44,7 @@ def pre_day_sale_num(wh_dept_id, commodity_id, date_val, shop_way):
         '12': 'december_num'
     }
 
-    with open('./predictive_sql.yml', encoding='utf-8') as f:
+    with open('../conf/predictive_sql.yml', encoding='utf-8') as f:
         yml_data = yaml.load(f, Loader=yaml.CLoader)
         mysql_sql = yml_data['cul_sale_shop']
         mysql_conf = yml_data['mysql']
@@ -199,6 +199,6 @@ def pre_day_sale_num(wh_dept_id, commodity_id, date_val, shop_way):
 # 全国: '-1'
 wh = '327193'
 commodity = 5990
-date = '2023-07-15'
+date = '2023-11-17'
 shop = '自营'
 pre_day_sale_num(wh, commodity, date, shop)

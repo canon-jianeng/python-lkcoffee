@@ -30,6 +30,11 @@ def get_now_date():
     return datetime.datetime.strftime(get_now_time(), '%Y-%m-%d')
 
 
+def get_yesterday_date():
+    # 昨天日期
+    return cul_date(get_now_date(), -1)
+
+
 def cul_days(left_date, right_date):
     # 两个日期相差天数
     day_num = (str_to_date(right_date) - str_to_date(left_date)).days
@@ -280,3 +285,4 @@ if __name__ == '__main__':
     print(date_compare('2023-07-24', '2023-08-13', '2023-08-01'))
     print(get_now_time())
     print(get_diff_month_num('2022-08-31', '2023-11-06'))
+    print(get_yesterday_date())
