@@ -44,7 +44,7 @@ sql:
   val_bi_warehouse_commodity_sale_shop_day: "({}, {}, {}, {}, {}, '{}', {}, '2023-06-01 00:00:00')"
   insert_bi_warehouse_commodity_sale_shop_week: "INSERT INTO `lucky_cooperation`.`t_bi_warehouse_commodity_sale_shop_week` (`wh_dept_id`, `commodity_id`, `mark_type`, `type`, `year`, `week_id`, `amount`, `create_time`) VALUES "
   val_bi_warehouse_commodity_sale_shop_week: "({}, {}, {}, {}, {}, {}, {}, '2023-06-01 00:00:00')"
-  insert_bi_warehouse_commodity_sale_shop_month: "INSERT INTO `lucky_cooperation`.`t_bi_warehouse_commodity_sale_shop_month` (`wh_dept_id`, `commodity_id`, `mark_type`, `type`, `year`, `january_num`, `january_num`, `february_num`, `march_num`, `april_num`, `may_num`, `june_num`, `july_num`, `august_num`, `september_num`, `october_num`, `november_num`, `december_num`, `total_num`, `create_time`) VALUES "
+  insert_bi_warehouse_commodity_sale_shop_month: "INSERT INTO `lucky_cooperation`.`t_bi_warehouse_commodity_sale_shop_month` (`wh_dept_id`, `commodity_id`, `mark_type`, `type`, `year`, `january_num`, `february_num`, `march_num`, `april_num`, `may_num`, `june_num`, `july_num`, `august_num`, `september_num`, `october_num`, `november_num`, `december_num`, `total_num`, `create_time`) VALUES "
   val_bi_warehouse_commodity_sale_shop_month: "({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, '2023-06-01 00:00:00')"
   insert_alg_new_demand_plan: "INSERT INTO `lucky_cooperation`.`t_alg_new_demand_plan` (`wh_dept_id`, `goods_id`, `predict_date`, `pred_shop_consume`, `pred_shop_order`, `pred_wh_consume`, `pred_wh_cg`, `update_time`) VALUES "
   val_alg_new_demand_plan: "({}, {}, '{}', {}, {}, {}, {}, '2023-08-28 15:56:37')"

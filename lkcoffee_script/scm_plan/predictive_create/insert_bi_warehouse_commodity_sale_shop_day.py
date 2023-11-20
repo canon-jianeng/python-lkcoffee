@@ -29,15 +29,15 @@ date_list_last_year = lk_tools.datetool.get_month_date(str(now_year-1)+'-12')
 date_list_now = lk_tools.datetool.get_month_date(str(now_year)+'-12')
 # 明年日期
 date_list_next_year = lk_tools.datetool.get_month_date(str(now_year+1)+'-12')
-date_list = date_list_last_year + date_list_now + date_list_next_year
+# date_list = date_list_last_year + date_list_now + date_list_next_year
+date_list = date_list_now + date_list_next_year
 
 wh_dept_id = [
     '327193', '245971', '245871', '326932', '326327', '-1'
 ]
 
 # 1:新品，2:常规
-commodity_dict = {'1': [5990, 6192, 801], '2': [5352, 800]}
-
+commodity_dict = {'1': [5990, 6192, 801], '2': [6976, 5352, 800]}
 
 # 类型 10:自营售卖门店,20:联营售卖门店,30:合计
 shop_type = ['10', '20', '30']

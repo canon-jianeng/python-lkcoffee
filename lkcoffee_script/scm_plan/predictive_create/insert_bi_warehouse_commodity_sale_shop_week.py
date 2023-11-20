@@ -26,7 +26,7 @@ wh_dept_id = [
 ]
 
 # 1:新品，2:常规
-commodity_dict = {'1': [5990, 6192, 801], '2': [5352, 800]}
+commodity_dict = {'1': [5990, 6192, 801], '2': [6976, 5352, 800]}
 
 # 类型 10:自营售卖门店,20:联营售卖门店,30:合计
 shop_type = ['10', '20', '30']
@@ -55,12 +55,12 @@ cursor = db_cooperation.cursor()
 
 week_list = []
 # 前一年的周范围列表
-cursor.execute(
-    sql_query.format(now_year-1)
-)
-data = cursor.fetchall()
-for date_val in data:
-    week_list.append(date_val)
+# cursor.execute(
+#     sql_query.format(now_year-1)
+# )
+# data = cursor.fetchall()
+# for date_val in data:
+#     week_list.append(date_val)
 
 # 当前年的周范围列表
 cursor.execute(
@@ -73,7 +73,19 @@ for date_val in data:
         week_flag = 1
     if week_flag == 0:
         week_list.append(date_val)
-# print(week_list)
+
+# 后一年的周范围列表
+cursor.execute(
+    sql_query.format(now_year+1)
+)
+data = cursor.fetchall()
+week_flag = 0
+for date_val in data:
+    if date_val[0] <= now_date <= date_val[1]:
+        week_flag = 1
+    if week_flag == 0:
+        week_list.append(date_val)
+print(week_list)
 
 val_data = ''
 val_sql = sql_insert_value + ',\n'
@@ -118,6 +130,7 @@ for week_val in week_list:
                             year_val, week_val[2], amount
                         )
                         val_data += val_str
+                        print(val_str)
                         amount = 0
 insert_data = sql_insert + '\n' + val_data
 

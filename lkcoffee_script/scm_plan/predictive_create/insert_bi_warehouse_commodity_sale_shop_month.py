@@ -27,7 +27,8 @@ wh_dept_id = [
 ]
 
 # 1:新品，2:常规
-commodity_dict = {'1': [5990, 6192, 801], '2': [5352, 800]}
+# commodity_dict = {'1': [5990, 6192, 801], '2': [6976, 5352, 800]}
+commodity_dict = {'2': [6976]}
 
 # 类型 10:自营售卖门店,20:联营售卖门店,30:合计
 shop_type = ['10', '20', '30']
@@ -55,8 +56,8 @@ sql_query_amount = mysql_sql['query_bi_warehouse_commodity_sale_shop_day']
 cursor = db_cooperation.cursor()
 
 # 年份列表
-year_list = [now_year-1, now_year]
-
+# year_list = [now_year-1, now_year, now_year+1]
+year_list = [now_year, now_year+1]
 
 def get_month_num(year: int, month: int, wh_val, commodity, type_int):
     end_date = lk_tools.datetool.get_month_days(year, month)
@@ -119,6 +120,7 @@ for year_val in year_list:
                         total_amount
                     )
                     val_data += val_str
+                    print(val_str)
 insert_data = sql_insert + '\n' + val_data
 
 
