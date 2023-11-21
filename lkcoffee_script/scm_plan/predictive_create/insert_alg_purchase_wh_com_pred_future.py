@@ -39,7 +39,7 @@ date_list_now = lk_tools.datetool.get_month_date(str(now_year)+'-12')
 # 明年日期
 date_list_next_year = lk_tools.datetool.get_month_date(str(now_year+1)+'-12')
 # date_list = date_list_last_year + date_list_now + date_list_next_year
-date_list = date_list_now + date_list_next_year
+date_list = date_list_now
 
 
 wh_dept_id = [
@@ -47,7 +47,8 @@ wh_dept_id = [
 ]
 
 # 新品
-commodity_list = [5990, 6192, 801, 6967, 6973, 6991, 6992, 6976]
+# commodity_list = [5352, 5990, 6192, 801, 6967, 6973, 6991, 6992, 6976]
+commodity_list = [6195]
 
 
 with open('./sql.yml', encoding='utf-8') as f:
