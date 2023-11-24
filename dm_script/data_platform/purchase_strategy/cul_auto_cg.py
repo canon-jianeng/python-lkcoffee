@@ -1,7 +1,7 @@
 
 import yaml
 import pymysql
-from lkcoffee_script import lk_tools
+import lk_tools
 
 now_time = lk_tools.datetool.get_now_time()
 now_date = lk_tools.datetool.get_now_date()

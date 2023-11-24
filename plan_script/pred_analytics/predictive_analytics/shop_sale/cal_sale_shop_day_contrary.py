@@ -2,7 +2,7 @@
 import pymysql
 import datetime
 import yaml
-from lkcoffee_script import lk_tools
+import lk_tools
 
 """
 

@@ -2,7 +2,7 @@
 import json
 import yaml
 import pymysql
-from lkcoffee_script import lk_tools
+import lk_tools
 from current_stock import stock_list
 from transit_data import transit_data
 from theory_shop_stock import theory_shop_stock_list

@@ -3,7 +3,7 @@ import time
 from datetime import date, datetime, timedelta
 import pymysql
 import yaml
-from lkcoffee_script import lk_tools
+import lk_tools
 from ..shop_data import get_shop_num
 
 """

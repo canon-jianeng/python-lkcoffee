@@ -5,7 +5,7 @@ import os.path
 import yaml
 import pymysql
 import get_operating_num
-from lkcoffee_script import lk_tools
+import lk_tools
 
 """
 杯量预测: 只取营业门店数

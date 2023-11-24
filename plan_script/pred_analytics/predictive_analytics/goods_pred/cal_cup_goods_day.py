@@ -2,8 +2,8 @@ import time
 from datetime import datetime
 import pymysql
 import yaml
-from lkcoffee_script.scm_plan.predictive_analytics.conf import cup_data
-import shop_operating
+from plan_script.pred_analytics.predictive_analytics.conf import cup_data
+from ..shop_data import get_sale_num
 
 """
 算法-采购仓库货物预测表（常规品）: t_alg_purchase_wh_com_pred_future

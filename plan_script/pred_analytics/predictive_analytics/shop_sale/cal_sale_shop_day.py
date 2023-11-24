@@ -2,7 +2,7 @@
 import pymysql
 import datetime
 import yaml
-from lkcoffee_script import lk_tools
+import lk_tools
 
 """
 售卖门店数-日纬度 -> 周维度/月维度

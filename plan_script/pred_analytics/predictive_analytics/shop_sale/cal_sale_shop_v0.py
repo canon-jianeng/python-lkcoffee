@@ -2,7 +2,7 @@
 import pymysql
 import datetime
 import yaml
-from lkcoffee_script import lk_tools
+import lk_tools
 
 """
 V0版本, 常规品售卖门店数-日纬度
