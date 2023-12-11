@@ -2,7 +2,7 @@
 import pandas as pd
 import numpy as np
 
-file_path = '../data/dinghuo_target_inventory_week.csv'
+file_path = '../data/dinghuo_target_inventory.csv'
 df = pd.read_csv(file_path)
 
 # 显示所有列
@@ -15,7 +15,8 @@ columns = df.columns
 print(columns)
 
 # 查询条件
-data_condition = (df["predict_date"] == '2023-10-19')
+# data_condition = (df["dt"] == '2023-10-25')
+data_condition = (df["predict_date"] == '2023-12-12')
 # data_condition = (df["predict_date"] == '2023-10-24') & (df["goods_id"] == 25694)
 # data_condition = (df["goods_id"] == 25694)
 query_data = df.loc[
@@ -24,9 +25,15 @@ query_data = df.loc[
 
 # print(type(query_data))
 # print(query_data)
-print(query_data['predict_date'])
+# print(query_data['predict_date'])
 # print(query_data['pred_consume'])
 
+# 根据 dt 查询 predict_date 的日期
+df_data = pd.DataFrame(query_data['predict_date'])
+# 根据所有列删除重复的行, 默认保留第一次出现的重复值
+# 删除特定列上的重复项
+df_data = df_data.drop_duplicates(subset=['predict_date'])
+print(df_data)
 
 # 一、删除，查询部分数据(过滤不需要的数据)
 # df.loc[
@@ -39,7 +46,7 @@ print(query_data['predict_date'])
 #     data_condition,
 #     # 赋值的字段
 #     'predict_date'
-# ] = '2023-10-19'
+# ] = '2023-12-12'
 
 # 数据写入文件
 # 不存储 index 信息: index=False
