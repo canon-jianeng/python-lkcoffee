@@ -17,8 +17,8 @@ print(columns)
 # 查询条件
 # data_condition = (df["dt"] == '2023-10-25')
 data_condition = (df["predict_date"] == '2023-12-12')
-# data_condition = (df["predict_date"] == '2023-10-24') & (df["goods_id"] == 25694)
-# data_condition = (df["goods_id"] == 25694)
+# data_condition = (df["predict_date"] == '2023-12-12') & (df["goods_id"] == 25533)
+# data_condition = (df["goods_id"] == 27178)
 query_data = df.loc[
     data_condition
 ]
@@ -29,10 +29,10 @@ query_data = df.loc[
 # print(query_data['pred_consume'])
 
 # 根据 dt 查询 predict_date 的日期
-df_data = pd.DataFrame(query_data['predict_date'])
+df_data = pd.DataFrame(query_data['goods_id'])
 # 根据所有列删除重复的行, 默认保留第一次出现的重复值
 # 删除特定列上的重复项
-df_data = df_data.drop_duplicates(subset=['predict_date'])
+df_data = df_data.drop_duplicates(subset=['goods_id'])
 print(df_data)
 
 # 一、删除，查询部分数据(过滤不需要的数据)
@@ -45,8 +45,8 @@ print(df_data)
 # df.loc[
 #     data_condition,
 #     # 赋值的字段
-#     'predict_date'
-# ] = '2023-12-12'
+#     'goods_id'
+# ] = '6967'
 
 # 数据写入文件
 # 不存储 index 信息: index=False
