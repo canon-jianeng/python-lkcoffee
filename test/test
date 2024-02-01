@@ -1,0 +1,261 @@
+select '2023' as year, '09' as month, 6991 as typeId, 86969 as goodsId, 0 as type, 500 as needNum union all
+select '2023' as year, '10' as month, 6991 as typeId, 86969 as goodsId, 0 as type, 500 as needNum union all
+select '2023' as year, '11' as month, 6991 as typeId, 86969 as goodsId, 0 as type, 500 as needNum union all
+select '2023' as year, '12' as month, 6991 as typeId, 86969 as goodsId, 0 as type, 500 as needNum union all
+select '2024' as year, '01' as month, 6991 as typeId, 86969 as goodsId, 0 as type, 500 as needNum union all
+select '2024' as year, '02' as month, 6991 as typeId, 86969 as goodsId, 0 as type, 500 as needNum union all
+select '2024' as year, '03' as month, 6991 as typeId, 86969 as goodsId, 0 as type, 500 as needNum union all
+select '2024' as year, '04' as month, 6991 as typeId, 86969 as goodsId, 0 as type, 500 as needNum union all
+select '2024' as year, '05' as month, 6991 as typeId, 86969 as goodsId, 0 as type, 500 as needNum union all
+select '2024' as year, '06' as month, 6991 as typeId, 86969 as goodsId, 0 as type, 500 as needNum union all
+select '2024' as year, '07' as month, 6991 as typeId, 86969 as goodsId, 0 as type, 500 as needNum union all
+select '2024' as year, '08' as month, 6991 as typeId, 86969 as goodsId, 0 as type, 500 as needNum union all
+select '2024' as year, '09' as month, 6991 as typeId, 86969 as goodsId, 0 as type, 500 as needNum union all
+select '2023' as year, '09' as month, 6992 as typeId, 83207 as goodsId, 0 as type, 600 as needNum union all
+select '2023' as year, '10' as month, 6992 as typeId, 83207 as goodsId, 0 as type, 600 as needNum union all
+select '2023' as year, '11' as month, 6992 as typeId, 83207 as goodsId, 0 as type, 600 as needNum union all
+select '2023' as year, '12' as month, 6992 as typeId, 83207 as goodsId, 0 as type, 600 as needNum union all
+select '2024' as year, '01' as month, 6992 as typeId, 83207 as goodsId, 0 as type, 600 as needNum union all
+select '2024' as year, '02' as month, 6992 as typeId, 83207 as goodsId, 0 as type, 600 as needNum union all
+select '2024' as year, '03' as month, 6992 as typeId, 83207 as goodsId, 0 as type, 600 as needNum union all
+select '2024' as year, '04' as month, 6992 as typeId, 83207 as goodsId, 0 as type, 600 as needNum union all
+ select '2024' as year, '05' as month, 6992 as typeId, 83207 as goodsId, 0 as type, 600 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '06' as month, 6992 as typeId, 83207 as goodsId, 0 as type, 600 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '07' as month, 6992 as typeId, 83207 as goodsId, 0 as type, 600 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '08' as month, 6992 as typeId, 83207 as goodsId, 0 as type, 600 as needNum union all
+
+ 
+ 
+ 
+ select '2023' as year, '09' as month, 6967 as typeId, 86764 as goodsId, 0 as type, 900 as needNum union all
+
+ 
+ 
+ 
+ select '2023' as year, '10' as month, 6967 as typeId, 86764 as goodsId, 0 as type, 900 as needNum union all
+
+ 
+ 
+ 
+ select '2023' as year, '11' as month, 6967 as typeId, 86764 as goodsId, 0 as type, 900 as needNum union all
+
+ 
+ 
+ 
+ select '2023' as year, '12' as month, 6967 as typeId, 86764 as goodsId, 0 as type, 900 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '01' as month, 6967 as typeId, 86764 as goodsId, 0 as type, 900 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '02' as month, 6967 as typeId, 86764 as goodsId, 0 as type, 900 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '03' as month, 6967 as typeId, 86764 as goodsId, 0 as type, 900 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '04' as month, 6967 as typeId, 86764 as goodsId, 0 as type, 900 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '05' as month, 6967 as typeId, 86764 as goodsId, 0 as type, 900 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '06' as month, 6967 as typeId, 86764 as goodsId, 0 as type, 900 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '07' as month, 6967 as typeId, 86764 as goodsId, 0 as type, 900 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '08' as month, 6967 as typeId, 86764 as goodsId, 0 as type, 900 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '09' as month, 6967 as typeId, 86764 as goodsId, 0 as type, 900 as needNum union all
+
+ 
+ 
+ 
+ select '2023' as year, '09' as month, 6967 as typeId, 22519 as goodsId, 0 as type, 500 as needNum union all
+
+ 
+ 
+ 
+ select '2023' as year, '10' as month, 6967 as typeId, 22519 as goodsId, 0 as type, 500 as needNum union all
+
+ 
+ 
+ 
+ select '2023' as year, '11' as month, 6967 as typeId, 22519 as goodsId, 0 as type, 500 as needNum union all
+
+ 
+ 
+ 
+ select '2023' as year, '12' as month, 6967 as typeId, 22519 as goodsId, 0 as type, 500 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '01' as month, 6967 as typeId, 22519 as goodsId, 0 as type, 500 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '02' as month, 6967 as typeId, 22519 as goodsId, 0 as type, 500 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '03' as month, 6967 as typeId, 22519 as goodsId, 0 as type, 500 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '04' as month, 6967 as typeId, 22519 as goodsId, 0 as type, 500 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '05' as month, 6967 as typeId, 22519 as goodsId, 0 as type, 500 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '06' as month, 6967 as typeId, 22519 as goodsId, 0 as type, 500 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '07' as month, 6967 as typeId, 22519 as goodsId, 0 as type, 500 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '08' as month, 6967 as typeId, 22519 as goodsId, 0 as type, 500 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '09' as month, 6967 as typeId, 22519 as goodsId, 0 as type, 500 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '09' as month, 6992 as typeId, 83207 as goodsId, 0 as type, 600 as needNum union all
+ 
+ 
+ 
+ select '2023' as year, '12' as month, 6973 as typeId, 42 as goodsId, 0 as type, 600 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '01' as month, 6973 as typeId, 42 as goodsId, 0 as type, 600 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '02' as month, 6973 as typeId, 42 as goodsId, 0 as type, 600 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '03' as month, 6973 as typeId, 42 as goodsId, 0 as type, 600 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '04' as month, 6973 as typeId, 42 as goodsId, 0 as type, 600 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '05' as month, 6973 as typeId, 42 as goodsId, 0 as type, 600 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '06' as month, 6973 as typeId, 42 as goodsId, 0 as type, 600 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '07' as month, 6973 as typeId, 42 as goodsId, 0 as type, 600 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '08' as month, 6973 as typeId, 42 as goodsId, 0 as type, 600 as needNum union all
+
+ 
+ 
+ 
+ select '2023' as year, '12' as month, 6973 as typeId, 85844 as goodsId, 0 as type, 300 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '01' as month, 6973 as typeId, 85844 as goodsId, 0 as type, 300 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '02' as month, 6973 as typeId, 85844 as goodsId, 0 as type, 300 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '03' as month, 6973 as typeId, 85844 as goodsId, 0 as type, 300 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '04' as month, 6973 as typeId, 85844 as goodsId, 0 as type, 300 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '05' as month, 6973 as typeId, 85844 as goodsId, 0 as type, 300 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '06' as month, 6973 as typeId, 85844 as goodsId, 0 as type, 300 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '07' as month, 6973 as typeId, 85844 as goodsId, 0 as type, 300 as needNum union all
+
+ 
+ 
+ 
+ select '2024' as year, '08' as month, 6973 as typeId, 85844 as goodsId, 0 as type, 300 as needNum
