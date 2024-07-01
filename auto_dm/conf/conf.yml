@@ -1,0 +1,17 @@
+
+test:
+  url_dataservice: "http://dataservice-gateway-test03.lkcoffee.com"
+  url_dataq: "http://dataqtest03.lkcoffee.com"
+  url_sky_engine: "http://skyenginetest03.lkcoffee.com"
+  idata_operator: "jianeng.chen"
+  idata_name: "p_smarketsever"
+  idata_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoicF9zbWFya2V0c2V2ZXIiLCJhdHkiOiJ1c3IiLCJlbnYiOiJ0ZXN0IiwiaXNzIjoibHVja2luY29mZmVlIiwic3ViIjoib25lZGF0YSIsImV4cCI6MjE0NTg4ODAwMH0.F3HhC5MmEK8nbAyo7uLNCh9Rly7rih_8dgIk5uxCNWg"
+  url_chronus: "https://chronustest03.lkcoffee.com"
+  chronus_user: "jianeng.chen"
+  chronus_pwd: "Canon-2020"
+
+prod:
+  url_dataq: "http://dataqx.lkcoffee.com"
+  idata_name: "p_xiaMenTest"
+  idata_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoicF94aWFNZW5UZXN0IiwiYXR5IjoidXNyIiwiZW52IjoicHJvZCIsImlzcyI6Imx1Y2tpbmNvZmZlZSIsInN1YiI6Im9uZWRhdGEiLCJleHAiOjIxNDU4ODgwMDB9.f1qJkDLgOaslsekg9KyFA23UsTgWE9S1uvxUCGwkRbU"
+
