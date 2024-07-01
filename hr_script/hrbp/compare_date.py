@@ -37,6 +37,6 @@ if __name__ == '__main__':
     for field_list in compare_list:
         print(field_list)
         compare_dates(
-            '/Users/canon/Downloads/日报(2024-06-01-2024-06-30).xlsx',
+            '../data/日报(2024-06-01-2024-06-30).xlsx',
             field_list
         )
